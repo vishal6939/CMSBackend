@@ -20,6 +20,8 @@ var corsOptions = {
   
 require('./server/router/routes/router')(app);
 require('./server/routes/patientRoutes')(app);
+require('./server/routes/registrationRoutes')(app);
+
 const db = require('./server/config/db');
 
 

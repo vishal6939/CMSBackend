@@ -1301,6 +1301,23 @@ exports.Observation = async(req,res,next) =>{
 			});
 		})
 	}
+	
+	exports.findObservation = async(req,res,next) =>{
+		db.observations.findOne({
+			where: {patientId:req.params.patientId,type:req.params.type},
+			
+		}).then(observation => {
+			res.status(200).json({
+				"description": "Observation Content Page",
+				"observation": observation
+			});
+		}).catch(err => {
+			res.status(500).json({
+				"description": "Can not access Observation Page",
+				"error": err
+			});
+		})
+	}
 	exports.findAllObservations = (req, res) => {
 		db.observations.findAll({
 		where:{patientId:req.params.patientId},

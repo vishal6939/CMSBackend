@@ -5,7 +5,7 @@ const multer = require('multer');
 const express = require('express');
 const { Router } = require('express');
 const UUID = require('uuid-generate')
-const uniqueKey = UUID.generate()
+// const req['uniqueId'] = UUID.generate()
 var dicomParser = require('../../node_modules/dicom-parser/dist/dicomParser');
 const Patient = db.patientmodel;
 // Load in Rusha so we can calculate sha1 hashes
@@ -24,17 +24,17 @@ var dicomImageStorage = multer.diskStorage({
       })
     }
     else {
-      if(!fs.existsSync(`./directory/${uniqueKey}`)) {
-        fs.mkdir(`./directory/${uniqueKey}`, {recursive:true}, (err)=>{
+      if(!fs.existsSync(`./directory/${req['uniqueId']}`)) {
+        fs.mkdir(`./directory/${req['uniqueId']}`, {recursive:true}, (err)=>{
           if (err) {
             console.log("Children directory issue")
             return cb(null, false, new Error('Something Went wrong,please try again')); 
           } 
         })
       }
-      cb(null,`./directory/${uniqueKey}`);
-      console.log(`./directory/${uniqueKey}`)
-      module.exports = { folderName: `./directory/${uniqueKey}` };
+      cb(null,`./directory/${req['uniqueId']}`);
+      console.log(`./directory/${req['uniqueId']}`)
+      module.exports = { folderName: `./directory/${req['uniqueId']}` };
     }
    },
   filename: function (req, file, cb) {
@@ -44,9 +44,19 @@ var dicomImageStorage = multer.diskStorage({
 var dicomupload = multer({ errorHandling: 'manual' , storage: dicomImageStorage })
 
   module.exports = function(app) {
+    app.use(function (req, res, next) {
+      req['uniqueId'] = UUID.generate()
+      console.log(req['uniqueId'])
+
+      res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+      res.setHeader('Access-Control-Allow-Methods', 'POST');
+      res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+      res.setHeader('Access-Control-Allow-Credentials', true);
+      next();
+    });
     app.post('/api/addpatient/:id',dicomupload.array("uploads[]", 12),async function GetDicomData(req,res) {
       const multipart = require('connect-multiparty');
-      //const uniqueKey = require('../router/routes/router')
+      //const req['uniqueId'] = require('../router/routes/router')
       const multer = require('multer');
      
       // var storage = multer.diskStorage({
@@ -60,7 +70,8 @@ var dicomupload = multer({ errorHandling: 'manual' , storage: dicomImageStorage 
        
       // var upload = multer({storage: storage});
        
-    
+      console.log(req['uniqueId'])
+
     
     // Function to calculate the SHA1 Hash for a buffer with a given offset and length
     function sha1(buffer, offset, length) {
@@ -150,13 +161,13 @@ var dicomupload = multer({ errorHandling: 'manual' , storage: dicomImageStorage 
         if (req.uploadError) {
         return res.end('Error uploading in dicom images')
       }
-      let patientObj = await GetDicomData(`./directory/${uniqueKey}`)
+      let patientObj = await GetDicomData(`./directory/${req['uniqueId']}`)
       //Rename the dicom files here 
-      fs.readdirSync(`./directory/${uniqueKey}`).forEach(function (name,index) {
-        var oldfilepath = `./directory/${uniqueKey}/${name}`
-        var newfilepath = `./directory/${uniqueKey}/${index}.dcm`
+      fs.readdirSync(`./directory/${req['uniqueId']}`).forEach(function (name,index) {
+        var oldfilepath = `./directory/${req['uniqueId']}/${name}`
+        var newfilepath = `./directory/${req['uniqueId']}/${index}.dcm`
         fs.renameSync(oldfilepath,newfilepath )
-        fileLength =fs.readdirSync(`./directory/${uniqueKey}`).length
+        fileLength =fs.readdirSync(`./directory/${req['uniqueId']}`).length
         console.log(fileLength)
       })
       Patient.create({ 
@@ -167,7 +178,7 @@ var dicomupload = multer({ errorHandling: 'manual' , storage: dicomImageStorage 
         testdate:patientObj.testdate,
         clinicId:req.params.id,
         //type: req.file.mimetype,
-        dicomImagesId: uniqueKey,   //mapping the patient to dicom images 
+        dicomImagesId: req['uniqueId'],   //mapping the patient to dicom images 
         status: 'created',
         length: fileLength,
         }).then((patient) => {

@@ -21,41 +21,10 @@ var dicomParser = require('../../../node_modules/dicom-parser/dist/dicomParser')
 // Load in Rusha so we can calculate sha1 hashes
  var Rusha = require('../../../node_modules/rusha/dist/rusha');
 
-// var dicomImageStorage = multer.diskStorage({
-//   destination: function(req, file, cb) {
-//     if(!fs.existsSync("./directory")) {
-//       fs.mkdir('./directory', {recursive:true}, (err)=>{
-//         if (err) {
-//             console.log("Parent directory issue")
-//             return cb(null, false, new Error('Something Went wrong,please try again')); 
-//         }
-//       })
-//     }
-//     else {
-//       if(!fs.existsSync(`./directory/${uniqueKey}`)) {
-//         fs.mkdir(`./directory/${uniqueKey}`, {recursive:true}, (err)=>{
-//           if (err) {
-//             console.log("Children directory issue")
-//             return cb(null, false, new Error('Something Went wrong,please try again')); 
-//           } 
-//         })
-//       }
-//       cb(null,`./directory/${uniqueKey}`);
-//       console.log(`./directory/${uniqueKey}`)
-//       module.exports = { folderName: `./directory/${uniqueKey}` };
-//     }
-//    },
-//   filename: function (req, file, cb) {
-//       cb(null ,Date.now()+'.dcm')
-//   }
-// });
-// var dicomupload = multer({ errorHandling: 'manual' , storage: dicomImageStorage })
-
-
 
 module.exports = function(app) {
   const controller = require('../../controller/controller'); 
-	app.post('/api/auth/registration',  controller.registration);
+	//app.post('/api/auth/registration',  controller.registration);
 	
 	app.post('/api/auth/signin', controller.signin);
 
@@ -141,6 +110,8 @@ app.get('/api/auth/findbydate/:testdate/:status/:clinicId',controller.findByDate
 
 app.post('/api/auth/observation/:patientId/:type', controller.Observation);
 app.get('/api/findOne/observation/:id',controller.getObservation)
+app.get('/api/findOne/observation/:patientId/:type',controller.findObservation)
+
 app.get('/api/findall/observations/:patientId',controller.findAllObservations);
 
 
