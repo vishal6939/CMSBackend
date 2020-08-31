@@ -143,4 +143,5 @@ app.post('/api/auth/observation/:patientId/:type', controller.Observation);
 app.get('/api/findOne/observation/:id',controller.getObservation)
 app.get('/api/findall/observations/:patientId',controller.findAllObservations);
 
+
 }

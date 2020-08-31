@@ -1252,7 +1252,25 @@ return res.status(200).json({
 // Observations Master 
 
 exports.Observation = async(req,res,next) =>{
-	db.observations.create({
+	let totalCount = await db.observations.findAndCountAll({
+				where:{
+		  patientId:req.params.patientId,type:req.params.type
+				},
+				raw:true
+			});
+			console.log(totalCount.count)	
+			if(totalCount.count === 1){
+			const patientId = req.params.id;
+					// const{ password} = req.body
+					db.observations.update( { ...req.body ,
+					}, 
+							 { where: {patientId: req.params.patientId,type:req.params.type} }
+							 ).then(() => {
+							 res.status(200).send({message:" updated successfully"});
+							 });
+							}
+			if(totalCount.count === 0){
+			db.observations.create({
 			patientId : req.params.patientId,
 			type: req.params.type,
 			...req.body,
@@ -1264,6 +1282,8 @@ exports.Observation = async(req,res,next) =>{
 				   return res.status(200).json({
 					"message":"submitted successfully"   })
 				})
+			}
+					
 	}
 	exports.getObservation = async(req,res,next) =>{
 		db.observations.findOne({
