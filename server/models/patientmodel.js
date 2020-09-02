@@ -28,7 +28,7 @@ reportbase:{
     required:truncate
 },
 age:{
-    type:DataTypes.INTEGER,
+    type:DataTypes.STRING,
     required: true
 },
 height:{
@@ -173,6 +173,12 @@ type: {
     required: true
   },
   status:{
+    type: DataTypes.STRING
+},
+tapse:{
+    type: DataTypes.STRING
+},
+mapse:{
     type: DataTypes.STRING
 },
 length:{

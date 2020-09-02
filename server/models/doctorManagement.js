@@ -60,11 +60,14 @@ module.exports = (sequelize, DataTypes) => {
    required: true
 
   },
-//   profileImagesId:{
-//     type: DataTypes.STRING,
-//     required:true
-// },
-
+  profileImagesId:{
+    type: DataTypes.STRING,
+    required:true
+},
+logoImagesId:{
+  type: DataTypes.STRING,
+  required:true
+},
 qualification : {
   type: DataTypes.STRING,
  required: true

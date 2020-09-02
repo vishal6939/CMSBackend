@@ -111,7 +111,6 @@ app.get('/api/auth/findbydate/:testdate/:status/:clinicId',controller.findByDate
 app.post('/api/auth/observation/:patientId/:type', controller.Observation);
 app.get('/api/findOne/observation/:id',controller.getObservation)
 app.get('/api/findOne/observation/:patientId/:type',controller.findObservation)
-
 app.get('/api/findall/observations/:patientId',controller.findAllObservations);
 
 

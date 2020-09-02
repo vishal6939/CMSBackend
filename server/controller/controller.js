@@ -467,7 +467,7 @@ exports.updatePatient = (req, res) => {
 			 { where: {id: req.params.id} }
 			 ).then(() => {
 			 console.log(req.body)
-			 res.status(200).send({data:"patient updated successfully"});
+			 res.status(200).send({message:"patient updated successfully"});
 			 });
   };
 

@@ -115,10 +115,14 @@ googlemaplocation: {
   type: DataTypes.STRING,
   required: true
 },
-  //   profileImagesId:{
-  //     type: DataTypes.STRING,
-  //     required:true
-  // },
+profileImagesId:{
+  type: DataTypes.STRING,
+  required:true
+},
+logoImagesId:{
+type: DataTypes.STRING,
+required:true
+},
     
    }, 
   {
