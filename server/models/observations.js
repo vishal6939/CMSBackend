@@ -20,8 +20,15 @@ module.exports = (sequelize, DataTypes) => {
     type: DataTypes.JSON, 
     required: true
   },
+  mastervalue:{
+    type: DataTypes.JSON, 
+    required: true
+  },
+  comment:{
+    type: DataTypes.JSON, 
+    required: true
+  },
   
-
   
    }, 
   {

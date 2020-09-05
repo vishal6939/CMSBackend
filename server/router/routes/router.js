@@ -86,7 +86,7 @@ app.delete('/api/auth/deletekinmaster/:id',  controller.deleteKin);
 
 ///////////////////////////////////////
 
-app.get('/api/findall/masters',controller.findobservations);
+//app.get('/api/findall/masters',controller.findobservations);
 
 
 ///////////////////////////////////////////// Master Tables

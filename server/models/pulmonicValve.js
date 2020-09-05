@@ -3,12 +3,7 @@
 module.exports = (sequelize, DataTypes) => {
   const TIMESTAMP = require('sequelize-mysql-timestamp')(sequelize);
   const pulmonicValve= sequelize.define('pulmonicValve', {   
-      key: {
-        type: DataTypes.INTEGER,
-        // autoIncrement: true,
-        // primaryKey: true
-      },
-      value: {
+    itemName: {
         type: DataTypes.STRING,
        required: true
         },     

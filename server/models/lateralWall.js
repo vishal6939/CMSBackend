@@ -3,12 +3,7 @@
 module.exports = (sequelize, DataTypes) => {
   const TIMESTAMP = require('sequelize-mysql-timestamp')(sequelize);
   const lateralWall= sequelize.define('lateralwall', {   
-      key: {
-        type: DataTypes.INTEGER,
-        // autoIncrement: true,
-        // primaryKey: true
-      },
-      value: {
+    itemName: {
         type: DataTypes.STRING,
        required: true
         },     

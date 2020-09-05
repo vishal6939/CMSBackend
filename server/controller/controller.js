@@ -45,6 +45,7 @@ const patientmodel=require('../models/patientmodel');
 const { response, request } = require('express');
 const { loginLookUp, doctorManagement } = require('../config/db');
 const clinicManagement = require('../models/clinicManagement');
+const { send } = require('process');
  
 exports.registration = async(req, res) => {
 
@@ -770,7 +771,7 @@ exports.deleteKin = (req, res) => {
 	});
   };
 
-  exports.findobservations = async(req, res) => {
+const fetchMastterVariables = async() => {
 
 	const anteriorSeptum = await db.anteriorSeptum.findAll({
 		where: {},
@@ -1017,8 +1018,7 @@ exports.deleteKin = (req, res) => {
 	})
 
 	
-	return res.status(200).json({
-		"master":[{
+	return {
 		anteriorSeptum:anteriorSeptumData,
  anteriorWall:anteriorWallData,
   aorta:aortaData,
@@ -1047,9 +1047,9 @@ rightVentricle:rightVentricleData,
 tricuspidValve:tricuspidValveData,
 venous:venousData
 		
-		}]
-	})
-}
+		}
+	}
+
 
 //////////////////////////////////
 
@@ -1318,20 +1318,42 @@ exports.Observation = async(req,res,next) =>{
 			});
 		})
 	}
-	exports.findAllObservations = (req, res) => {
-		db.observations.findAll({
-		where:{patientId:req.params.patientId},
+	// exports.findAllObservations = (req, res) => {
+	// 	db.observations.findAll({
+	// 	where:{patientId:req.params.patientId},
 		
-		}).then(observation => {
-			res.status(200).json({
-				"description": "observation Page",
-				"user": observation,
+	// 	}).then(observation => {
+	// 		res.status(200).json({
+	// 			"description": "observation Page",
+	// 			"user": observation,
 				
-			});
-		}).catch(err => {
-			res.status(500).json({
-				"description": "Can not access observation Page",
-				"error": err
-			});
-		})
+	// 		});
+	// 	}).catch(err => {
+	// 		res.status(500).json({
+	// 			"description": "Can not access observation Page",
+	// 			"error": err
+	// 		});
+	// 	})
+	// }
+
+
+
+	exports.findAllObservations = async(req, res) => {
+		try{
+			let formatedfinalList = []
+		const observations = await db.observations.findAll({
+		where:{patientId:req.params.patientId}})
+		const masterTablesData = await fetchMastterVariables()
+		return res.send({observations:observations,masterData:masterTablesData})
+	}catch{
+		return res.send({})
 	}
+}
+
+
+		
+
+
+
+			
+	
