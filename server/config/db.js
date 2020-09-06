@@ -73,45 +73,7 @@ db.patientmodel=require('../models/patientmodel')(sequelize, Sequelize);
 
 db.observations=require('../models/observations')(sequelize, Sequelize);
 
-
-db.anteriorSeptumObservation=require('../models/anteriorSeptumObservation')(sequelize, Sequelize);
-db.anteriorWallObservation=require('../models/anteriorWallObservation')(sequelize, Sequelize);
-db.aortaObservation=require('../models/aortaObservation')(sequelize, Sequelize);
-db.aorticValveObservation=require('../models/aorticValveObservation')(sequelize, Sequelize);
-db.conclusionObservation=require('../models/conclusionObservation')(sequelize, Sequelize);
-db.doctorAdviceObservation=require('../models/doctorAdviceObservation')(sequelize, Sequelize);
-db.inferiorSeptumObservation=require('../models/inferiorSeptumObservation')(sequelize, Sequelize);
-db.inferiorVenaCavaObservation=require('../models/inferiorVenaCavaObservation')(sequelize, Sequelize);
-db.inferiorWallObservation=require('../models/inferiorWallObservation')(sequelize, Sequelize);
-db.intracardiacDataObservation=require('../models/intracardiacDataObservation')(sequelize, Sequelize);
-db.intraCardiacTumourObservation=require('../models/intraCardiacTumourObservation')(sequelize, Sequelize);
-db.lateralWallObservation=require('../models/lateralWallObservation')(sequelize, Sequelize);
-db.leftAtriumObservation=require('../models/leftAtriumObservation')(sequelize, Sequelize);
-db.leftVentricalObservation=require('../models/leftVentricalObservation')(sequelize, Sequelize);
-db.leftVentricalFunctionObservation=require('../models/leftVentricalFunctionObservation')(sequelize, Sequelize);
-db.mitralValveObservation=require('../models/mitralValveObservation')(sequelize, Sequelize);
-db.pericardialEffusionObservation=require('../models/pericardialEffusionObservation')(sequelize, Sequelize)
-db.pericardiumObservation=require('../models/pericardiumObservation')(sequelize, Sequelize);
-db.posteriorWallObservation=require('../models/posteriorWallObservation')(sequelize, Sequelize);
-db.pulmonaryArteryObservation=require('../models/pulmonaryArteryObservation')(sequelize, Sequelize);
-db.pulmonaryVeinObservation=require('../models/pulmonaryVeinObservation')(sequelize, Sequelize);
-db.pulmonicValveObservation=require('../models/pulmonicValveObservation')(sequelize, Sequelize);
-db.rightAtriumObservation=require('../models/rightAtriumObservation')(sequelize, Sequelize);
-db.rightVentricalFunctionObservation=require('../models/rightVentricalFunctionObservation')(sequelize, Sequelize);
-db.rightVentricleObservation=require('../models/rightVentricleObservation')(sequelize, Sequelize);
-db.tricuspidValveObservation=require('../models/tricuspidValveObservation')(sequelize, Sequelize);
-db.venousObservationObservation=require('../models/venousobservation')(sequelize, Sequelize);
-
-
-
-// db.doctorManagement.belongsTo(db.clinicManagement,{through:'doctorManagement',foreignKey:'clinicId',otherKey:'id'});
 db.doctorAssignment.belongsTo(db.doctorManagement);
 db.doctorAssignment.belongsTo(db.clinicManagement);
-//db.assignmentStatus.belongsTo(db.doctorManagement,{through:'doctorManagement',foreignKey:'doccId',otherKey:'id'});
- //db.assignmentStatus.belongsTo(db.clinicManagement,{through:'clinicManagement',foreignKey:'clinicId',otherKey:'id'});
-
- 
-// db.loginLookUp.belongsToMany(db.clinicManagement, { through: 'loginLookUp', foreignKey: 'loginLookUpId', otherKey: 'clinicId'});
-// db.clinicManagement.belongsToMany(db.loginLookUp);
 
 module.exports = db;
