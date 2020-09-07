@@ -11,48 +11,21 @@ const LeftVentricle = db.leftVentrical;
 const PatientMaster = db.patientMaster;
 const KinMaster = db.kinMaster;
 const Observations = db.observations;
-
-//const UUID = require('uuid-generate')
 const multipart = require('connect-multiparty');
 const Sequelize = require('sequelize');
-//const uniqueKey = UUID.generate()
-const _dirname = require('../../index')
 const fs = require('fs');
 const multer = require('multer');
-const folderName = require('../router/routes/router');
-
-
-function getFolderpath(req) {
-  return  `main-directory/1/sai`
-  }
-
-// const multipartMiddleware =  multipart({ uploadDir: getFolderpath()})
-// const multipartMiddlewareForProfileImages =  multipart({ uploadDir: './profileImages'})
-
 const Op = db.Sequelize.Op;
 var dicomParser = require('../../node_modules/dicom-parser/dist/dicomParser');
-
 // Load in Rusha so we can calculate sha1 hashes
  var Rusha = require('../../node_modules/rusha/dist/rusha');
-
 var jwt = require('jsonwebtoken');
-var bcrypt = require('bcryptjs');
-const clinicManagementModel = require('../models/clinicManagement');
-const loginLookupModel = require('../models/loginLookUp.model');
-// const assignmentStatusModel = require('../models/assignmentStatus');
-const patientmodel=require('../models/patientmodel');
-
-const { response, request } = require('express');
-const { loginLookUp, doctorManagement } = require('../config/db');
-const clinicManagement = require('../models/clinicManagement');
-const { send } = require('process');
- 
 exports.registration = async(req, res) => {
 
 	const{username,password,role} = req.body;
     
 	if(role === 'CLINIC'){
-	console.log(folderName)	
+	
 		var usernameIsValid = await ClinicManagement.findOne({
 			where:{
 	  username:req.body.username
@@ -116,18 +89,14 @@ if(role === 'DOCTOR'){
 	const createDoctor= await DoctorManagement.create({
 	 ...req.body,
 	}).then(doctorManagement => {
-		
-	// 	// exit node.js app
-	 	res.json({'message': 'Registered successfully!','user':req.body,count:totalCount.count,status:200});
-	
+	 	res.json({'message': 'Registered successfully!','user':req.body,count:totalCount.count,status:200})
 	})
 
 }
 	}
 else{
 	return res.status(401).send({ auth: false, accessToken: null, message: "Username already exists!" ,});
-	// res.json({'message':'cannot enter',count:totalCount.count});
-}
+	}
 }
 
 
@@ -138,41 +107,6 @@ const createLoginLookup = await db.loginLookUp.create({
 	  role:req.body.role,
 })
 };
-
-exports.profileImage = async(req, res,next) => {
-// 	console.log('adsasasa')
-//   multipartMiddlewareForProfileImages(req,res,next)
-//   function getFolderpath2(req) {
-// 	return  `./profileImages`
-// 	}
-// fs.readdirSync(getFolderpath2()).forEach(function (name) {
-// 	var profilename = fs.readFileSync(getFolderpath2()+'/'+name);
-// 	console.log("kaushik")
-
-// console.log(name)
-// console.log("vishal")
-var multiparty = require('multiparty');
-
-var data = new multiparty.Form();
-
- data.parse(req, function(err, fields, files) {
-   console.log(files);
-    var fileContent = fs.readFileSync(files.file[0].path,'utf8');
-     res.json(fileContent   );
-    });
-
-  const createClinic= await ClinicManagement.create({
-	...req.body,
-   
-	   }).then(clinicManagement => {
-		   console.log(clinicManagement)
-	   
-		   // exit node.js app
-		   res.json({'message': 'File uploaded successfully!', 'file': req.file,'user':req.body});
-	   })
-}
-
-
 exports.assignmentStatus = async(req, res) => {
 
 	// Save ClinicManagement to Database
@@ -189,8 +123,6 @@ exports.assignmentStatus = async(req, res) => {
 
 exports.signin =  (req, res) => {
 	console.log("Sign-In");
-	
-    
 	db.clinicManagement.findOne({
 		where: {
 			username: req.body.username
@@ -231,10 +163,7 @@ else{
 	});
 	
 }
-
-
 checkPassword = (req,data,res) => {
-	
 	console.log(data.role);
 	var role= data.role;
 	var pass1 = Buffer.from(req.body.password); 
@@ -267,17 +196,11 @@ exports.clinicContent = (req, res) => {
 	ClinicManagement.findAll({
 		where: {id: req.clinicId},
 		attributes: ['name','address', 'username', 'country','state',],
-		// include: [{
-		// 	model: LoginLookUp,
-		// 	attributes: ['id', 'username','role'],
-		// 	through: {
-		// 		attributes: ['clinicId', 'loginLookUpId'],
-		// 	}
-		// }]
+	
 	}).then(clinic => {
 		res.status(200).json({
 			"description": "ClinicManagement Content Page",
-			"clinic": clinic
+		"clinic": clinic
 		});
 	}).catch(err => {
 		res.status(500).json({
@@ -288,7 +211,6 @@ exports.clinicContent = (req, res) => {
 }
 exports.updateClinicContent = (req, res) => {
 	const id = req.params.id;
-	// const{ password} = req.body
 	ClinicManagement.update( { ...req.body ,
 	}, 
 			 { where: {id: req.params.id} }
@@ -427,13 +349,6 @@ exports.getListOfAssignments = (req,res) =>{
 	AssignmentStatus.findAll({
 		where: {clinicId: req.params.id,[Op.or]: [{clinicId: req.params.id}, {docId: req.params.id}] },
 		attributes: ['name','mobNo', 'email', 'status', 'docId','id'],
-		// include: [{
-		// 	model: LoginLookUp,
-		// 	attributes: ['id', 'username','role'],
-		// 	through: {
-		// 		attributes: ['clinicId', 'loginLookUpId'],
-		// 	}
-		// }]
 	}).then(assignment => {
 		res.status(200).json({ 
 			"listOfAssignments": assignment
@@ -1158,23 +1073,6 @@ exports.getonemaster = (req,res) => {
 	})
 }
 
-// exports.findByDate = (req, res) => {
-// 	db.patientmodel.findAll({
-// 		where: {testdate: req.params.testdate,status:req.params.status},
-		
-// 	}).then(patient => {
-// 		res.status(200).json({
-// 			"description": "patient Content Page",
-// 			"patient": patient
-// 		});
-// 	}).catch(err => {
-// 		res.status(500).json({
-// 			"description": "Can not access patient Page",
-// 			"error": err
-// 		});
-// 	})
-// }
-
 exports.findByDate = async(req, res) => {
 	db.patientmodel.findAll({
 		where: {testdate: req.params.createddate,status:req.params.status},
@@ -1318,26 +1216,6 @@ exports.Observation = async(req,res,next) =>{
 			});
 		})
 	}
-	// exports.findAllObservations = (req, res) => {
-	// 	db.observations.findAll({
-	// 	where:{patientId:req.params.patientId},
-		
-	// 	}).then(observation => {
-	// 		res.status(200).json({
-	// 			"description": "observation Page",
-	// 			"user": observation,
-				
-	// 		});
-	// 	}).catch(err => {
-	// 		res.status(500).json({
-	// 			"description": "Can not access observation Page",
-	// 			"error": err
-	// 		});
-	// 	})
-	// }
-
-
-
 	exports.findAllObservations = async(req, res) => {
 		try{
 			let formatedfinalList = []

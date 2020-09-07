@@ -23,7 +23,7 @@ db.clinicManagement = require('../models/clinicManagement.js')(sequelize, Sequel
 db.doctorManagement = require('../models/doctorManagement.js')(sequelize, Sequelize);
 db.doctorAssignment = require('../models/doctorAssignment.js')(sequelize, Sequelize);
 db.assignmentStatus = require('../models/assignmentStatus.js')(sequelize, Sequelize);
-db.loginLookUp=require('../models/loginLookUp.model.js')(sequelize, Sequelize);
+//db.loginLookUp=require('../models/loginLookUp.model.js')(sequelize, Sequelize);
 db.admin=require('../models/admin.model.js')(sequelize, Sequelize);
 
 db.anteriorSeptum=require('../models/anteriorSeptum.js')(sequelize, Sequelize);
@@ -73,7 +73,7 @@ db.patientmodel=require('../models/patientmodel')(sequelize, Sequelize);
 
 db.observations=require('../models/observations')(sequelize, Sequelize);
 
-db.doctorAssignment.belongsTo(db.doctorManagement);
-db.doctorAssignment.belongsTo(db.clinicManagement);
+// db.doctorAssignment.belongsTo(db.doctorManagement);
+// db.doctorAssignment.belongsTo(db.clinicManagement);
 
 module.exports = db;

@@ -9,25 +9,18 @@ const Sequelize = require('sequelize');
 const uniqueKey = UUID.generate()
 const express = require('express')
 const app = express()
-// const port = 3000
 const db = require('../../config/db');
 const Patient = db.patientmodel;
 var GetDicomData = require('../../controller/controller')
-// const bodyParser = require("body-parser");
-// const cors = require('cors')
 const upload = require('../../config/upload');
 var dicomParser = require('../../../node_modules/dicom-parser/dist/dicomParser');
-
 // Load in Rusha so we can calculate sha1 hashes
  var Rusha = require('../../../node_modules/rusha/dist/rusha');
 
 
 module.exports = function(app) {
-  const controller = require('../../controller/controller'); 
-	//app.post('/api/auth/registration',  controller.registration);
-	
+  const controller = require('../../controller/controller');	
 	app.post('/api/auth/signin', controller.signin);
-
 	app.post('/api/auth/assignment',  controller.assignmentStatus);
 // CLINIC
 app.get('/api/test/user', [authJwt.verifyToken], controller.clinicContent);
@@ -57,8 +50,6 @@ app.get('/api/auth/master/:data',controller.master );
 
 //patient
 
-// app.post('/api/create/patient/:id',dicomupload.array('dicomUploads'),controller.createPatient
-// );
 app.put('/api/update/patient/:id',controller.updatePatient);
 app.delete('/api/delete/patient/:id',controller.deletePatient);
 app.get('/api/findall/patient/:clinicId/:status',controller.findpatient);
@@ -83,12 +74,6 @@ app.get('/api/auth/findkinmaster',controller.findkinMaster)
 app.get('/api/auth/findonekinmaster/:id',controller.findOneKinMaster)
 app.put('/api/auth/updatekinmaster/:id',controller.updateKinMaster)
 app.delete('/api/auth/deletekinmaster/:id',  controller.deleteKin);
-
-///////////////////////////////////////
-
-//app.get('/api/findall/masters',controller.findobservations);
-
-
 ///////////////////////////////////////////// Master Tables
 
 app.get('/api/auth/getmaster/:data',controller.getmaster)
@@ -102,8 +87,6 @@ app.get('/api/auth/findonemaster/:id/:data',controller.getonemaster)
 app.post('/api/auth/obs', controller.obs);
 
 /////////////////////////////////////////////////////////// 
-
-//app.get('/api/auth/findbydate/:testdate/:status',controller.findByDate)
 app.get('/api/auth/findbydate/:testdate/:status/:clinicId',controller.findByDate)
 
 ///////////////////////////////////

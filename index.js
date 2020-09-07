@@ -13,10 +13,6 @@ var corsOptions = {
 
 
   app.use(cors(corsOptions))
-
-
-  //const { Router } = require('express');
-//   var Router = require('./server/routes/patientRoutes');
   
 require('./server/router/routes/router')(app);
 require('./server/routes/patientRoutes')(app);
@@ -65,18 +61,5 @@ app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:500
 
 global.__basedir = __dirname;
 function initial(){
-	// Role.create({
-	// 	id: 1,
-	// 	name: "CLinicManagement"
-	// });
-	
-	// Role.create({
-	// 	id: 2,
-	// 	name: "ADMIN"
-	// });
-	
-	// Role.create({
-	// 	id: 3,
-	// 	name: "PM"
-	// });
+
 }

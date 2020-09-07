@@ -5,7 +5,6 @@ const multer = require('multer');
 const express = require('express');
 const { Router } = require('express');
 const UUID = require('uuid-generate')
-// const req['uniqueId'] = UUID.generate()
 var dicomParser = require('../../node_modules/dicom-parser/dist/dicomParser');
 const Patient = db.patientmodel;
 // Load in Rusha so we can calculate sha1 hashes
@@ -56,23 +55,8 @@ var dicomupload = multer({ errorHandling: 'manual' , storage: dicomImageStorage 
     });
     app.post('/api/addpatient/:id',dicomupload.array("uploads[]", 12),async function GetDicomData(req,res) {
       const multipart = require('connect-multiparty');
-      //const req['uniqueId'] = require('../router/routes/router')
       const multer = require('multer');
-     
-      // var storage = multer.diskStorage({
-      //   destination: (req, file, cb) => {
-      // 	cb(null, __basedir + '/profileImages')
-      //   },
-      //   filename: (req, file, cb) => {
-      // 	cb(null, file.originalname)
-      //   }
-      // });
-       
-      // var upload = multer({storage: storage});
-       
       console.log(req['uniqueId'])
-
-    
     // Function to calculate the SHA1 Hash for a buffer with a given offset and length
     function sha1(buffer, offset, length) {
       offset = offset || 0;
