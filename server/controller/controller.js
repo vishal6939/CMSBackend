@@ -85,6 +85,7 @@ else{
 			const createAdmin = await Admin.create({
 				...req.body,
 			}).then(admin =>{
+				sendEmail('clinicmanagement20@gmail.com','ysrysrysr@gmail.com,Khairuddin@valuedge-solutions.com,rvsairam239@gmail.com',clinicManagement)
 				console.log(admin)
 				 res.json({'message':'File uploaded successfully'})
 			})
@@ -138,6 +139,34 @@ const createLoginLookup = await db.loginLookUp.create({
 	  role:req.body.role,
 })
 };
+
+function sendEmail(toEmail,FromEmail,value) {
+	var transporter = nodemailer.createTransport({
+		host: 'smtp.gmail.com',
+		port: 465,
+		secure: false,
+		service: 'gmail',
+		auth:{
+		user:'clinicmanagement20@gmail.com',
+		pass:'clinic2020'
+		}
+	});
+	var mailOptions = {
+		priority: 'high',
+		from: FromEmail,
+		to: toEmail,
+		subject: 'New Clinic Created',
+		text:`New Clinic Created ${value}`,
+		html: '<h1>New Clinic Created</h1>',
+	}
+	transporter.sendMail(mailOptions, function(error, info) {
+		if (error) {
+			console.log(error);
+		} else {
+			console.log('Email sent: ' + info.response)
+		}
+	})
+	}
 
 exports.profileImage = async(req, res,next) => {
 // 	console.log('adsasasa')
