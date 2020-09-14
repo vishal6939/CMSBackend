@@ -114,4 +114,9 @@ app.get('/api/findOne/observation/:patientId/:type',controller.findObservation)
 app.get('/api/findall/observations/:patientId',controller.findAllObservations);
 
 
+///////////////////////////////
+
+//app.post('/api/create/report/:patientId/:type',controller.report)
+app.post('/api/update/observation/:patientId',controller.updateobs)
+app.put('/api/update/report/:patientId',controller.updatereport)
 }

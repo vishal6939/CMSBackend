@@ -94,7 +94,9 @@
        });
      
      var Upload = Imagesupload.fields([{ name: 'profileImage', maxCount: 1 }, { name: 'logoImage', maxCount: 1 }]);
+     
      app.post('/api/auth/registration', Upload,async function  (req,res) {
+      //app.post('/api/auth/registration', Imagesupload.single('uploadedImage'),async function  (req,res) {
          const{username,password,role} = req.body;
    
      if(role === 'CLINIC'){

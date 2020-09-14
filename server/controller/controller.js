@@ -808,6 +808,11 @@ const fetchMastterVariables = async() => {
 	raw: true,
 		
 	})
+	const impressions = await db.impressions.findAll({
+		where: {},
+	raw: true,
+		
+	})
 	const inferiorVenaCava = await db.inferiorVenaCava.findAll({
 		where: {},
 	raw: true,
@@ -903,6 +908,11 @@ const fetchMastterVariables = async() => {
 	raw: true,
 		
 	})
+	const speckleTracking = await db.speckleTracking.findAll({
+		where: {},
+	raw: true,
+		
+	})
 	const venous = await db.venous.findAll({
 		where: {},
 	raw: true,
@@ -933,6 +943,10 @@ const fetchMastterVariables = async() => {
 		
 	})
 	const inferiorSeptumData = inferiorSeptum.map(data => { 
+		return {...data}
+		
+	})
+	const impressionsData = impressions.map(data => { 
 		return {...data}
 		
 	})
@@ -1012,6 +1026,10 @@ const fetchMastterVariables = async() => {
 		return {...data}
 		
 	})
+	const speckleTrackingData = speckleTracking.map(data => { 
+		return {...data}
+		
+	})
 	const venousData = venous.map(data => { 
 		return {...data}
 		
@@ -1026,6 +1044,7 @@ const fetchMastterVariables = async() => {
   conclusion:conclusionData,
  doctorAdvice:doctorAdviceData,
  inferiorSeptum:inferiorSeptumData,
+ impressions:impressionsData,
   inferiorVenaCava:inferiorVenaCavaData,
   inferiorWall:inferiorWallData,
  intracardiacData:intracardiacDataData,
@@ -1045,6 +1064,7 @@ rightAtrium:rightAtriumData,
 rightVentricalFunction:rightVentricalFunctionData,
 rightVentricle:rightVentricleData,
 tricuspidValve:tricuspidValveData,
+speckleTracking:speckleTrackingData,
 venous:venousData
 		
 		}
@@ -1350,10 +1370,77 @@ exports.Observation = async(req,res,next) =>{
 	}
 }
 
-
+exports.report = async(req,res)=>{
+	const createregionalwallmotion = db.regionalwallmotion.create({
+		patientId:req.params.patientId,
+		...req.body,
+	})
+	const createimpressions = db.impressionreport.create({
+		patientId:req.params.patientId,
+		...req.body,
+	})
+	const createconclusion = db.conclusionreport.create({
+		patientId:req.params.patientId,
+		...req.body,
+	})
+	const createdoctoradvice = db.doctoradvicereport.create({
+		patientId:req.params.patientId,
+		...req.body,
+	})
+	return res.send({report:req.body,status:200})
+}
 		
+exports.updateobs = (req, res) => {
+	const id = req.params.id;
+	const {conclusions,doctorAdvice,impressions,wallmotion,selectedObservations} = req.body
+	//const {patientId}=req.params.patientId
+	console.log(selectedObservations);
+	console.log('oooooooooooooooooooooooo');
+	if(wallmotion){
+	const createregionalwallmotion = db.regionalwallmotion.create({
+		patientId:req.params.patientId,
+		...wallmotion,
+	})}
+	if(impressions){
+	const createimpressions = db.impressionreport.create({
+		patientId:req.params.patientId,
+		...impressions,
+	})}
+	if(conclusions){
+	const createconclusion = db.conclusionreport.create({
+		patientId:req.params.patientId,
+		...conclusions,
+	})}
+	if(doctorAdvice){
+	const createdoctoradvice = db.doctoradvicereport.create({
 
+		patientId:req.params.patientId,
+		...doctorAdvice,
+	})}
+	if(selectedObservations){
 
+console.log('**************');	
+console.log(req.body.type);
+	const updateobs=db.observations.update( { ...req.body}, 
+			 { where: {patientId:req.params.patientId,type:req.body.type} }
+			 )}
+			 res.status(200).send({report:req.body,message:"observation updated successfully"});
+  };
+
+  exports.updatereport = (req, res) => {
+	console.log(req.body);
+	const {selectedObservations} = req.body;
+	console.log(selectedObservations);
+	console.log('++++++')
+	console.log(selectedObservations.type);
+	const observationsreport = db.observations.update( { ...selectedObservations,
+	}, 
+			 { where: {patientId: req.params.patientId,type:selectedObservations.type} },
+			 //console.log(observationsreport)
+			 ).then(() => {
+			 res.status(200).send({message:"report updated successfully"});
+			 });
+  };
 
 			
 	
