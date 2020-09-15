@@ -11,6 +11,8 @@
  const DoctorManagement = db.doctorManagement
  // Load in Rusha so we can calculate sha1 hashes
   var Rusha = require('../../node_modules/rusha/dist/rusha');
+
+  const nodemailer = require('nodemailer')
  
  
  const app = express()
@@ -121,7 +123,7 @@
      
          }).then(clinicManagement => {
              console.log(clinicManagement) 
-         
+             sendEmail("clinicmanagement20@gmail.com,lavanya.thutta@gmail.com,gummadidhalavishal@gmail.com")
              // exit node.js app
              res.json({'message': 'File uploaded successfully!', 'file': req.file,'user':req.body});
          })
@@ -160,6 +162,7 @@
          }).then(doctorManagement => {
              
          // 	// exit node.js app
+         sendEmail("clinicmanagement20@gmail.com,lavanya.thutta@gmail.com,gummadidhalavishal@gmail.com")
               res.json({'message': 'File uploaded successfully!','user':req.body,count:totalCount.count});
          
          })
@@ -209,5 +212,33 @@
        })
     });
  
+
+    function sendEmail(toEmail,FromEmail,value) {
+      var transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: false,
+        service: 'gmail',
+        auth:{
+        user:'clinicmanagement20@gmail.com',
+        pass:'clinic2020'
+        }
+      });
+      var mailOptions = {
+        priority: 'high',
+        from: FromEmail,
+        to: toEmail,
+        subject: 'New Clinic Created',
+        text:`New Clinic Created ${value}`,
+        html: '<h1>New Clinic Created</h1>',
+      }
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response)
+        }
+      })
+      }
     
  }
