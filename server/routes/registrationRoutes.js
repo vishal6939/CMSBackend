@@ -76,7 +76,7 @@
  });
    var Imagesupload = multer({ errorHandling: 'manual' , storage: storage })
  
-    
+   
     
    module.exports = function(app) {
      app.use(function (req, res, next) {
@@ -94,12 +94,14 @@
          res.setHeader('Access-Control-Allow-Credentials', true);
          next();
        });
-     
+       
      var Upload = Imagesupload.fields([{ name: 'profileImage', maxCount: 1 }, { name: 'logoImage', maxCount: 1 }]);
      
      app.post('/api/auth/registration', Upload,async function  (req,res) {
       //app.post('/api/auth/registration', Imagesupload.single('uploadedImage'),async function  (req,res) {
          const{username,password,role} = req.body;
+
+        
    
      if(role === 'CLINIC'){
          
@@ -123,7 +125,8 @@
      
          }).then(clinicManagement => {
              console.log(clinicManagement) 
-             sendEmail("clinicmanagement20@gmail.com,lavanya.thutta@gmail.com,gummadidhalavishal@gmail.com")
+             //sendEmail("clinicmanagement20@gmail.com,ysrysrysr@gmail.com,Khairuddin@valuedge-solutions.com,rvsairam239@gmail.com")
+             sendEmail("clinicmanagement20@gmail.com,lavanya.thutta@gmail.com")
              // exit node.js app
              res.json({'message': 'File uploaded successfully!', 'file': req.file,'user':req.body});
          })
@@ -162,12 +165,16 @@
          }).then(doctorManagement => {
              
          // 	// exit node.js app
-         sendEmail("clinicmanagement20@gmail.com,lavanya.thutta@gmail.com,gummadidhalavishal@gmail.com")
+         //sendEmail("clinicmanagement20@gmail.com,ysrysrysr@gmail.com,Khairuddin@valuedge-solutions.com,rvsairam239@gmail.com")
+         sendEmail("clinicmanagement20@gmail.com,lavanya.thutta@gmail.com")
               res.json({'message': 'File uploaded successfully!','user':req.body,count:totalCount.count});
          
          })
      
+     } else{
+      res.json({'message':'cannot enter',count:totalCount.count});
      }
+
          }
      else{
          return res.status(401).send({ auth: false, accessToken: null, message: "Username already exists!" ,});

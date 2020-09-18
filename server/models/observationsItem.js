@@ -1,17 +1,23 @@
+'use strict'
+
 module.exports = (sequelize, DataTypes) => {
-    const TIMESTAMP = require('sequelize-mysql-timestamp')(sequelize);
-    const DoctorAdviceReport= sequelize.define('doctoradvicereport', { 
+  const TIMESTAMP = require('sequelize-mysql-timestamp')(sequelize);
+  const observationsItem= sequelize.define('observationsItem', {   
             itemName: {
             type: DataTypes.STRING,
             required: true
-            },         
-            doctoradvicecomment: {
+            }, 
+            type: {
             type: DataTypes.STRING,
             required: true
             },  
-            patientId:{
-            type:DataTypes.INTEGER,
-            required:true
+            observationId: {
+            type: DataTypes.INTEGER,
+            required: true
+            },    
+            patientId: {
+            type: DataTypes.INTEGER,
+            required: true
             }, 
             itemid: {
             allowNull: false,
@@ -22,6 +28,6 @@ module.exports = (sequelize, DataTypes) => {
             id:{
             type:DataTypes.INTEGER
             }
-            });
-        return DoctorAdviceReport;
-      };
+    });
+  return observationsItem;
+};

@@ -63,6 +63,10 @@ db.impressionreport = require('../models/impressionsreport')(sequelize, Sequeliz
 db.conclusionreport = require('../models/conclusionreport')(sequelize, Sequelize);
 db.doctoradvicereport = require('../models/doctoradvicereport')(sequelize, Sequelize);
 
+db.doctorAdviceComments = require('../models/doctorAdviceComments')(sequelize, Sequelize);
+db.conclusionsComments = require('../models/conclusionsComments')(sequelize, Sequelize);
+db.impressionComments = require('../models/impressionComments')(sequelize, Sequelize);
+db.observtaionComments = require('../models/observtaionComments')(sequelize, Sequelize);
 //
 
 
@@ -86,5 +90,11 @@ db.observations=require('../models/observations')(sequelize, Sequelize);
 
 db.doctorAssignment.belongsTo(db.doctorManagement);
 db.doctorAssignment.belongsTo(db.clinicManagement);
+
+////////////////////////////////////
+
+db.observationsItem = require('../models/observationsItem')(sequelize, Sequelize);
+
+
 
 module.exports = db;
