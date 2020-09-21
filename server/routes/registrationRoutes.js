@@ -11,6 +11,8 @@
  const DoctorManagement = db.doctorManagement
  // Load in Rusha so we can calculate sha1 hashes
   var Rusha = require('../../node_modules/rusha/dist/rusha');
+
+  const nodemailer = require('nodemailer')
  
  
  const app = express()
@@ -74,7 +76,7 @@
  });
    var Imagesupload = multer({ errorHandling: 'manual' , storage: storage })
  
-    
+   
     
    module.exports = function(app) {
      app.use(function (req, res, next) {
@@ -92,10 +94,14 @@
          res.setHeader('Access-Control-Allow-Credentials', true);
          next();
        });
-     
+       
      var Upload = Imagesupload.fields([{ name: 'profileImage', maxCount: 1 }, { name: 'logoImage', maxCount: 1 }]);
+     
      app.post('/api/auth/registration', Upload,async function  (req,res) {
+      //app.post('/api/auth/registration', Imagesupload.single('uploadedImage'),async function  (req,res) {
          const{username,password,role} = req.body;
+
+        
    
      if(role === 'CLINIC'){
          
@@ -119,7 +125,8 @@
      
          }).then(clinicManagement => {
              console.log(clinicManagement) 
-         
+             //sendEmail("clinicmanagement20@gmail.com,ysrysrysr@gmail.com,Khairuddin@valuedge-solutions.com,rvsairam239@gmail.com")
+             sendEmail("clinicmanagement20@gmail.com,lavanya.thutta@gmail.com")
              // exit node.js app
              res.json({'message': 'File uploaded successfully!', 'file': req.file,'user':req.body});
          })
@@ -158,11 +165,16 @@
          }).then(doctorManagement => {
              
          // 	// exit node.js app
+         //sendEmail("clinicmanagement20@gmail.com,ysrysrysr@gmail.com,Khairuddin@valuedge-solutions.com,rvsairam239@gmail.com")
+         sendEmail("clinicmanagement20@gmail.com,lavanya.thutta@gmail.com")
               res.json({'message': 'File uploaded successfully!','user':req.body,count:totalCount.count});
          
          })
      
+     } else{
+      res.json({'message':'cannot enter',count:totalCount.count});
      }
+
          }
      else{
          return res.status(401).send({ auth: false, accessToken: null, message: "Username already exists!" ,});
@@ -204,5 +216,33 @@
        })
     });
  
+
+    function sendEmail(toEmail,FromEmail,value) {
+      var transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: false,
+        service: 'gmail',
+        auth:{
+        user:'clinicmanagement20@gmail.com',
+        pass:'clinic2020'
+        }
+      });
+      var mailOptions = {
+        priority: 'high',
+        from: FromEmail,
+        to: toEmail,
+        subject: 'New Clinic Created',
+        text:`New Clinic Created ${value}`,
+        html: '<h1>New Clinic Created</h1>',
+      }
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response)
+        }
+      })
+      }
     
  }

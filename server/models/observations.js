@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     type: DataTypes.JSON, 
     required: true
   },
-  mastervalue:{
+  itemName:{
     type: DataTypes.JSON, 
     required: true
   },
@@ -28,7 +28,6 @@ module.exports = (sequelize, DataTypes) => {
     type: DataTypes.JSON, 
     required: true
   },
-  
   
    }, 
   {
