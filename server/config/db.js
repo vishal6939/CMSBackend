@@ -62,13 +62,14 @@ db.regionalwallmotion = require('../models/regionalwallmotion')(sequelize, Seque
 db.impressionreport = require('../models/impressionsreport')(sequelize, Sequelize);
 db.conclusionreport = require('../models/conclusionreport')(sequelize, Sequelize);
 db.doctoradvicereport = require('../models/doctoradvicereport')(sequelize, Sequelize);
+db.speckletrackingreport = require('../models/speckletrackingreport')(sequelize, Sequelize);
+
 
 db.doctorAdviceComments = require('../models/doctorAdviceComments')(sequelize, Sequelize);
 db.conclusionsComments = require('../models/conclusionsComments')(sequelize, Sequelize);
 db.impressionComments = require('../models/impressionComments')(sequelize, Sequelize);
 db.observtaionComments = require('../models/observtaionComments')(sequelize, Sequelize);
 //
-
 
 db.educationalMaster=require('../models/educationalMaster')(sequelize, Sequelize);
 db.salutationMaster=require('../models/salutationMaster')(sequelize, Sequelize);
