@@ -1442,7 +1442,7 @@ console.log(req.body.type);
 exports.updatereport = async(req, res) => {
 	
 	
-	const {selectedObservations,observations,conclusions,doctorAdvice,impressions,conclusionsComments,doctorAdviceComments, impressionComments,comments} = req.body;
+	const {selectedObservations,observations,conclusions,doctorAdvice,impressions,conclusionsComments,doctorAdviceComments, impressionComments,relativewall,speckleTracking} = req.body;
 		if (selectedObservations) {
 			console.log('****************');
 				for(i in selectedObservations){
@@ -1456,20 +1456,16 @@ exports.updatereport = async(req, res) => {
 							raw:true
 						});
 						console.log(selectedObservations[i][j])
-						if(totalCount.count>=0){
-					db.observationsItem.update({
-						...selectedObservations[i][j],
-						patientId:req.params.patientId
-										},{where:{
-											patientId:req.params.patientId,type:selectedObservations[i][j].type,itemName:selectedObservations[i][j].itemName ,id:selectedObservations[i][j].id
-												  }})
+						if(totalCount.count>0){
+					db.observationsItem.destroy({where:{
+											patientId:req.params.patientId,type:selectedObservations[i][j].type,											  }})
 						}
-						if(totalCount.count===0){
+	
 							db.observationsItem.create({
 								...selectedObservations[i][j],
 								patientId:req.params.patientId
 												})
-						}
+						
 				}
 				
 			}
@@ -1681,7 +1677,59 @@ exports.updatereport = async(req, res) => {
 																})
 										}					
 							}
-							} 	
+							} 
+							
+							if(relativewall){
+								let totalCount =  await db.regionalwallmotion.findAndCountAll({
+									where:{
+							  patientId:req.params.patientId
+									},
+									raw:true
+								});
+								console.log(totalCount.count)
+								if(totalCount.count>0){
+					                   db.regionalwallmotion.update({
+										...relativewall,
+									
+														},{where:{
+															patientId:req.params.patientId												  }})
+										}
+										if(totalCount.count===0){
+											const relativewallmotion = await db.regionalwallmotion.create({
+												...relativewall,
+												patientId:req.params.patientId
+			
+											})
+										}					
+							}
+						
+								
+							
+							if(speckleTracking){
+								for(let i=0;i<speckleTracking.length;i++){
+									//let objlength = Object.keys(impressionComments[i]).length
+									console.log(speckleTracking[i])
+										let totalCount =  await db.speckletrackingreport.findAndCountAll({
+											where:{
+									  patientId:req.params.patientId,itemName:speckleTracking[i].itemName
+											},
+											raw:true
+										});
+										if(totalCount.count>=0){
+									db.speckletrackingreport.update({
+										...speckleTracking[i],
+										patientId:req.params.patientId
+														},{where:{
+															patientId:req.params.patientId,speckleTracking:speckleTracking[i].itemName													  }})
+										}
+										if(totalCount.count===0){
+											db.speckletrackingreport.create({
+												...speckleTracking[i],
+												patientId:req.params.patientId
+																})
+										}					
+							}
+							}			
 				return res.json({message:"report updated successfully",selectedObservations,observations,conclusions,conclusions});
 	
 		}
