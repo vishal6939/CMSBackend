@@ -12,6 +12,7 @@ const PatientMaster = db.patientMaster;
 const KinMaster = db.kinMaster;
 const Observations = db.observations;
 
+const {sendEmail,textMessage} = require('../routes/registrationRoutes')
 
 //const UUID = require('uuid-generate')
 const multipart = require('connect-multiparty');
@@ -140,34 +141,6 @@ const createLoginLookup = await db.loginLookUp.create({
 	  role:req.body.role,
 })
 };
-
-function sendEmail(toEmail,FromEmail,value) {
-	var transporter = nodemailer.createTransport({
-		host: 'smtp.gmail.com',
-		port: 465,
-		secure: false,
-		service: 'gmail',
-		auth:{
-		user:'clinicmanagement20@gmail.com',
-		pass:'clinic2020'
-		}
-	});
-	var mailOptions = {
-		priority: 'high',
-		from: FromEmail,
-		to: toEmail,
-		subject: 'New Clinic Created',
-		text:`New Clinic Created ${value}`,
-		html: '<h1>New Clinic Created</h1>',
-	}
-	transporter.sendMail(mailOptions, function(error, info) {
-		if (error) {
-			console.log(error);
-		} else {
-			console.log('Email sent: ' + info.response)
-		}
-	})
-	}
 
 exports.profileImage = async(req, res,next) => {
 // 	console.log('adsasasa')
@@ -492,13 +465,36 @@ exports.getListOfAssignmentsinDoctor = (req,res) =>{
 }
  ///patient
 
-exports.updatePatient = (req, res) => {
+
+ exports.updatePatient = async(req, res) => {
 	const id = req.params.id;
+	console.log("+++++++++++++++++++++++++++++")
+	console.log(req.body)
+	const {docId,doctorList} = req.body;
+	console.log(docId)
 	Patient.update( { ...req.body,status:'assigned' }, 
 			 { where: {id: req.params.id} }
-			 ).then(() => {
-			 console.log(req.body)
-			 res.status(200).send({message:"patient updated successfully"});
+			 ).then(async () => {
+				const doctorInfo =  doctorList.filter(data => {
+					console.log(docId)
+					console.log(data.id)
+					return  data.id == docId
+				 })[0]
+				 //console.log("32456789")
+				//console.log(doctorInfo)
+
+				 let {name,email,mobNo,} = doctorInfo;
+				 console.log(email)
+				console.log(mobNo)
+				const doctorNo = []
+				doctorNo.push("+91"+mobNo)
+				  //email = 'gummadidhalavishal@gmail.com'
+				 await  sendEmail(email,{doctorName:name})
+				 await textMessage(doctorNo)
+				 
+			res.status(200).send({message:"patient updated successfully"});
+			  
+			
 			 });
   };
 
@@ -1414,7 +1410,8 @@ exports.findAllObservations = async(req, res) => {
 	 const impressioncomment = await db.impressionComments.findAll({where:{patientId:req.params.patientId}})
 	const doctorAdvicereport = await db.doctoradvicereport.findAll({where:{patientId:req.params.patientId}})
 	 const doctorAdviceComments = await db.doctorAdviceComments.findAll({where:{patientId:req.params.patientId}})
-
+	 const speckletrackingreport = await db.speckletrackingreport.findAll({where:{patientId:req.params.patientId}})	 	 
+	 const regionalWall = await db.regionalwallmotion.findAll({where:{patientId:req.params.patientId}})
 	return res.send({observations:observations,
 		masterData:masterTablesData,
 		 observationItem:observationItem,
@@ -1424,7 +1421,9 @@ exports.findAllObservations = async(req, res) => {
 		impressionreport:impressionreport,
 		impressioncomment:impressioncomment,
 		doctorAdvicereport:doctorAdvicereport,
-		doctorAdviceComments:doctorAdviceComments
+		doctorAdviceComments:doctorAdviceComments,
+		regionalWall:regionalWall,
+		speckleTrackingreport:speckletrackingreport
 	})
 }catch{
 	return res.send({})
@@ -1508,34 +1507,38 @@ exports.updatereport = async(req, res) => {
 	
 	
 	const {selectedObservations,observations,conclusions,doctorAdvice,impressions,conclusionsComments,doctorAdviceComments, impressionComments,relativewall,speckleTracking} = req.body;
-		if (selectedObservations) {
-			console.log('****************');
-				for(i in selectedObservations){
-					let objlength = Object.keys(selectedObservations[i]).length
-					for(j in selectedObservations[i]){
-						console.log(selectedObservations)
-						let totalCount =  await db.observationsItem.findAndCountAll({
-							where:{
-					  patientId:req.params.patientId,type:selectedObservations[i][j].type,itemName:selectedObservations[i][j].itemName,id:selectedObservations[i][j].id
-							},
-							raw:true
-						});
-						console.log(selectedObservations[i][j])
-						if(totalCount.count>0){
-					db.observationsItem.destroy({where:{
-											patientId:req.params.patientId,type:selectedObservations[i][j].type,											  }})
-						}
-	
-							db.observationsItem.create({
-								...selectedObservations[i][j],
-								patientId:req.params.patientId
-												})
-						
-				}
-				
+	if (selectedObservations) {
+		console.log('****************');
+			for(i in selectedObservations){
+				let objlength = Object.keys(selectedObservations[i]).length
+				for(j in selectedObservations[i]){
+					console.log(selectedObservations)
+					let totalCount =  await db.observationsItem.findAndCountAll({
+						where:{
+				  patientId:req.params.patientId,type:selectedObservations[i][j].type,itemName:selectedObservations[i][j].itemName,id:selectedObservations[i][j].id
+						},
+						raw:true
+					});
+					console.log(selectedObservations[i][j])
+					if(totalCount.count>=0){
+				db.observationsItem.update({
+					...selectedObservations[i][j],
+					patientId:req.params.patientId
+									},{where:{
+										patientId:req.params.patientId,type:selectedObservations[i][j].type,itemName:selectedObservations[i][j].itemName ,id:selectedObservations[i][j].id
+											  }})
+					}
+					if(totalCount.count===0){
+						db.observationsItem.create({
+							...selectedObservations[i][j],
+							patientId:req.params.patientId
+											})
+					}
 			}
-						
-				}
+			
+		} 
+					 
+			}
 				if (observations) {
 					// if(comments){
 					for(i in observations){
@@ -1637,7 +1640,7 @@ exports.updatereport = async(req, res) => {
 								}
 						
 						
-					}
+					} 
 								
 						}
 						if (impressions) {
@@ -1679,7 +1682,7 @@ exports.updatereport = async(req, res) => {
 											},
 											raw:true
 										});
-										if(totalCount.count>=0){
+										if(totalCount.count>0){
 									db.conclusionsComments.update({
 										...conclusionsComments[i],
 										patientId:req.params.patientId
@@ -1703,7 +1706,7 @@ exports.updatereport = async(req, res) => {
 											},
 											raw:true
 										});
-										if(totalCount.count>=0){
+										if(totalCount.count>0){
 									db.doctorAdviceComments.update({
 										...doctorAdviceComments[i],
 										patientId:req.params.patientId
@@ -1728,7 +1731,7 @@ exports.updatereport = async(req, res) => {
 											},
 											raw:true
 										});
-										if(totalCount.count>=0){
+										if(totalCount.count>0){
 									db.impressionComments.update({
 										...impressionComments[i],
 										patientId:req.params.patientId
@@ -1745,6 +1748,7 @@ exports.updatereport = async(req, res) => {
 							} 
 							
 							if(relativewall){
+								for(let i in relativewall){
 								let totalCount =  await db.regionalwallmotion.findAndCountAll({
 									where:{
 							  patientId:req.params.patientId
@@ -1768,8 +1772,8 @@ exports.updatereport = async(req, res) => {
 										}					
 							}
 						
-								
-							
+						} 
+												
 							if(speckleTracking){
 								for(let i=0;i<speckleTracking.length;i++){
 									//let objlength = Object.keys(impressionComments[i]).length
@@ -1780,7 +1784,7 @@ exports.updatereport = async(req, res) => {
 											},
 											raw:true
 										});
-										if(totalCount.count>=0){
+										if(totalCount.count>0){
 									db.speckletrackingreport.update({
 										...speckleTracking[i],
 										patientId:req.params.patientId
@@ -1794,7 +1798,7 @@ exports.updatereport = async(req, res) => {
 																})
 										}					
 							}
-							}			
+							}		
 				return res.json({message:"report updated successfully",selectedObservations,observations,conclusions,conclusions});
 	
 		}
