@@ -11,9 +11,6 @@
  const DoctorManagement = db.doctorManagement
  // Load in Rusha so we can calculate sha1 hashes
   var Rusha = require('../../node_modules/rusha/dist/rusha');
-  const ejs = require("ejs");
-  const axios = require('axios');
-  var https = require('https')
 
   const nodemailer = require('nodemailer')
  
@@ -220,10 +217,7 @@
     });
  
 
-   
-    }
-    async function  sendEmail(toEmail,value){
-
+    function sendEmail(toEmail,FromEmail,value) {
       var transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
@@ -234,76 +228,21 @@
         pass:'clinic2020'
         }
       });
-      ejs.renderFile(__dirname + "/doctorAssign.ejs", { variables: value }, async function (err, data) {
-        if (err) {
-            console.log(err);
+      var mailOptions = {
+        priority: 'high',
+        from: FromEmail,
+        to: toEmail,
+        subject: 'New Clinic Created',
+        text:`New Clinic Created ${value}`,
+        html: '<h1>New Clinic Created</h1>',
+      }
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          console.log(error);
         } else {
-          var mailOptions = {
-            priority: 'high',
-            from: 'clinicmanagement20@gmail.com',
-            to: toEmail,
-            subject: 'New Case Assigned',
-           html: data,
-          }
-        const result =   await transporter.sendMail(mailOptions)
+          console.log('Email sent: ' + info.response)
         }
-    });
+      })
       }
-
-
-      async function sendTextmessage(value) {
-        console.log(value)
-        axios({
-          "url": `https://api.karix.io/message/`,
-          "method": "POST",
-          "headers": {
-              "Content-Type": 'application/json',
-              "Authorization": "Basic ODBlMzdkM2UtNmUyYS00OWIxLWE1OTItMTk0MWVkZmM2MjA3Ojk5YTUwN2EzLWFmYzctNDY2NS04YTk2LWZmYzkwMDczOGNmZg=="
-          },
-          data: {
-              "channel": "sms",
-              "source": "+918143381405",
-              "destination": value,
-              "content": {
-              "text": "Hey Doctor, a new case is assigned to you from ClinicManagement"
-              }
-          }
-      })
-      .then(response => {
-         return response
-      })
-      .catch(error => {
-          console.log('error');
-      })
-      //   const options = {
-      //     path: 'https://api.karix.io/message/',
-      //     method: 'POST',
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       "Authorization": "Basic ODBlMzdkM2UtNmUyYS00OWIxLWE1OTItMTk0MWVkZmM2MjA3Ojk5YTUwN2EzLWFmYzctNDY2NS04YTk2LWZmYzkwMDczOGNmZg=="
-      //     },
-      //     body: {
-      //       "channel": "sms",
-      //       "source": "+918143381405",
-      //       "destination": [value],
-      //       "content": {
-      //       "text": "Hey Doctor, a new case is assigned to you from ClinicManagement"
-      //       }
-      //   }
-      // }
-
-        
-      //   https.request(options, res => {
-      //     console.log(`statusCode: ${res.statusCode}`)
-      //     return res
-      //   })
-      }
-      
-      module.exports.sendEmail = sendEmail
-    module.exports.textMessage = sendTextmessage
-
-      // module.exports= {
-      //   'sendEmail': sendEmail,
-      //   'textMessage': sendTextmessage
-      // }
-  
+    
+ }
