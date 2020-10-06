@@ -466,37 +466,95 @@ exports.getListOfAssignmentsinDoctor = (req,res) =>{
  ///patient
 
 
- exports.updatePatient = async(req, res) => {
+//  exports.updatePatient = async(req, res) => {
+// 	const id = req.params.id;
+// 	console.log("+++++++++++++++++++++++++++++")
+// 	console.log(req.body)
+// 	const {docId,doctorList} = req.body;
+// 	console.log('8888888888888888888888');
+// 	console.log(doctorList)
+// 	Patient.update( { ...req.body,status:'assigned' }, 
+// 			 { where: {id: req.params.id} }
+// 			 ).then(async () => {
+// 				const doctorInfo =  doctorList.filter(data => {
+// 					console.log(docId)
+// 					console.log(data.id)
+// 					return  data.id == docId
+// 				 })[0]
+// 				 //console.log("32456789")
+// 				//console.log(doctorInfo)
+
+// 				 let {name,email,mobNo,} = doctorInfo;
+// 				 console.log(email)
+// 				console.log(mobNo)
+// 				const doctorNo = []
+// 				doctorNo.push("+91"+mobNo)
+// 				  //email = 'gummadidhalavishal@gmail.com'
+// 		/**************** NEEDED  ********/
+// 				 await  sendEmail(email,{doctorName:name})
+// 				 //await textMessage(doctorNo)
+				 
+// 			res.status(200).send({message:"patient updated successfully"});
+			  
+			
+// 			 });
+//   };
+
+exports.updatePatient = async(req, res) => {
 	const id = req.params.id;
 	console.log("+++++++++++++++++++++++++++++")
-	console.log(req.body)
-	const {docId,doctorList} = req.body;
-	console.log(docId)
-	Patient.update( { ...req.body,status:'assigned' }, 
+	
+	const {docId,sendreport} = req.body;
+	
+	const pat=await Patient.findAll({ where: {id: req.params.id},raw:true})
+  console.log(pat[0].docId)
+  const doctorList = await DoctorManagement.findOne({where:{id:pat[0].docId},raw:true})
+  console.log(doctorList)
+	const patupdate = await Patient.update( { ...req.body,status:'assigned' }, 
 			 { where: {id: req.params.id} }
 			 ).then(async () => {
-				const doctorInfo =  doctorList.filter(data => {
-					console.log(docId)
-					console.log(data.id)
-					return  data.id == docId
-				 })[0]
-				 //console.log("32456789")
-				//console.log(doctorInfo)
+				
+				console.log(doctorList)
 
-				 let {name,email,mobNo,} = doctorInfo;
-				 console.log(email)
-				console.log(mobNo)
+				 let {name,email,mobNo,} = doctorList;
+				
 				const doctorNo = []
 				doctorNo.push("+91"+mobNo)
-				  //email = 'gummadidhalavishal@gmail.com'
+				  
+				  if(sendreport==='email'){
 				 await  sendEmail(email,{doctorName:name})
+				 console.log(email)
+				  }
+				  if(sendreport==='sms'){
 				 await textMessage(doctorNo)
-				 
+				  }
 			res.status(200).send({message:"patient updated successfully"});
 			  
 			
 			 });
   };
+
+  exports.updPatient = async(req,res)=>{
+	const id = req.params.id;
+	// const{ password} = req.body
+	Patient.update( { ...req.body ,status:'assigned' }, 
+			 { where: {id: req.params.id} }
+			 ).then(patient => {
+				res.status(200).json({
+					"description": "patient Details updated",
+					status:200
+					
+				});
+			}).catch(err => {
+				res.status(500).json({
+					"description": "Can not update patient Details",
+					"error": err,
+					status:500
+				});
+			})
+		
+}
+
 
   exports.deletePatient = (req, res) => {
 	const id = req.params.id;
@@ -600,8 +658,7 @@ return res.status(200).json({
 	
 })
 }
-
-
+ 
 
 exports.getAllPatients = (req, res) => {
 	Patient.findAll({
@@ -621,6 +678,33 @@ exports.getAllPatients = (req, res) => {
 		});
 	})
 }
+
+// exports.getAllPatients = async(req, res) => {
+// 	const patient=await	Patient.findAll({
+// 			where: {docId :req.params.docId},
+// 			raw:true,
+// 			order: [
+// 				[Sequelize.literal('id'), 'desc']
+// 		 ]
+// 		})
+// 	const docpatient = patient.map(async data=>{
+// 		const observationcount = await db.observations.findAndCountAll({
+// 			where:{patientId:data.id}
+	
+// 		 })
+// 		 totalCount= observationcount.count
+	
+// 		return {...data,totalCount}
+// 	})
+// 	const doctor = await Promise.all(docpatient)
+	
+// 	return res.status(200).json({
+// 		doctor,
+		
+// 	})
+// 	}
+
+
 exports.getPatient = (req, res) => {
 	Patient.findOne({
 		where: {id :req.params.id},
@@ -1555,281 +1639,270 @@ console.log(req.body.type);
   };
 
 
-
-			
   exports.updatereport = async(req, res) => {
 	
-	try{
+	
 	const {selectedObservations,observations,conclusions,doctorAdvice,impressions,conclusionsComments,doctorAdviceComments, impressionComments,comments,relativewall,speckleTracking} = req.body;
-		if (selectedObservations) {
-			console.log('****************');
-				for(i in selectedObservations){
-					let objlength = Object.keys(selectedObservations[i]).length
-					for(j in selectedObservations[i]){
-						//console.log(selectedObservations)
-						let totalCount =  await db.observationsItem.findAndCountAll({
-							where:{
-					  patientId:req.params.patientId,type:selectedObservations[i][j].type,							},
-							raw:true
-						});
-						console.log(selectedObservations[i][j])
-						if(totalCount.count>0){
-					db.observationsItem.destroy({where:{
-											patientId:req.params.patientId,type:selectedObservations[i][j].type
-												  }})
-						}
+		
+			try { 
+				if (selectedObservations) {
+					console.log('******');
+					const data =[].concat(...selectedObservations)
+					console.log(data)
+					let totalCount =  await db.observationsItem.findAndCountAll({
+						where:{
+				  patientId:req.params.patientId,							},
+						raw:true
+					});
+					console.log(totalCount.count)
+					if(totalCount.count>0){
+					await db.observationsItem.destroy({where:{
+							patientId:req.params.patientId,
+								  }})
+					}
+					for(i in data){
+					const obsitem=await	db.observationsItem.create({
+							itemName:data[i].itemName,
+							type:data[i].type,
+							id:data[i].id,
+							patientId:req.params.patientId
+											})
 					}
 				}
+			  } catch (err) {
+				// print the error details
+				console.log(err, ...selectedObservations);
+			  }
+
 						
-						for(i in selectedObservations){
-							for(j in selectedObservations[i]){
-							db.observationsItem.create({
-								...selectedObservations[i][j],
-								patientId:req.params.patientId
-												})
-						
-											}
-											}
+				
+				if (observations) {
+					// if(comments){
+					for(i in observations){
+						let objlength = Object.keys(observations[i]).length
+						//for(j in observations){
+							console.log(observations[i].comments)
+							if(observations[i].comments){
+								for(j in observations[i].comments){
+									console.log(observations[i].comments[j].comment)
+									let totalCount =  await db.observtaionComments.findAndCountAll({
+										where:{
+								  patientId:req.params.patientId,							},
+										raw:true
+									});
+									if(totalCount.count>0){
+								await db.observtaionComments.destroy({where:{
+														patientId:req.params.patientId,}})
+									}
+									
+									await db.observtaionComments.create({
+											...observations[i].comments[j],
+											patientId:req.params.patientId
+															})
+									
+							}
+		
+		
+								
+							}
 					
-						
+					
 				}
-			// 	if (observations) {
-			// 		// if(comments){
-			// 		for(i in observations){
-			// 			let objlength = Object.keys(observations[i]).length
-			// 			//for(j in observations){
-			// 				console.log(observations[i].comments)
-			// 				if(observations[i].comments){
-			// 					for(j in observations[i].comments){
-			// 						console.log(observations[i].comments[j].comment)
-			// 						let totalCount =  await db.observtaionComments.findAndCountAll({
-			// 							where:{
-			// 					  patientId:req.params.patientId,type:observations[i].comments[j].type,comment:observations[i].comments[j].comment
-			// 							},
-			// 							raw:true
-			// 						});
-			// 						if(totalCount.count>0){
-			// 					db.observtaionComments.destroy({where:{
-			// 											patientId:req.params.patientId,type:observations[i].comments[j].type,}})
-			// 						}
-									
-			// 							db.observtaionComments.create({
-			// 								...observations[i].comments[j],
-			// 								patientId:req.params.patientId
-			// 												})
-									
-			// 				}
-		
-		
-								
-			// 				}
+			// }		
+					}
+				if (conclusions) {
+					console.log('****CONCLUSIONS');
 					
-					
-			// 	}
-			// // }		
-			// 		}
-			// 	if (conclusions) {
-			// 		console.log('**********CONCLUSIONS');
-			// 		for(i in conclusions){
-			// 			//console.log(conclusions[i])
-			// 			let objlength = Object.keys(conclusions[i]).length
-			// 		//	for(j in conclusions[i]){
-			// 				console.log(conclusions[i])
+				
 
-			// 				let totalCount =  await db.conclusionreport.findAndCountAll({
-			// 					where:{
-			// 			  patientId:req.params.patientId,itemName:conclusions[i].itemName,id:conclusions[i].id
-			// 					},
-			// 					raw:true
+							let totalCount =  await db.conclusionreport.findAndCountAll({
+								where:{
+						  patientId:req.params.patientId,
+								},
+								raw:true
 							
-			// 				});
-			// 				console.log(conclusions[i])
-			// 				console.log(totalCount);
-			// 				console.log('-------------');
-			// 				if(totalCount.count>0){
-			// 			db.conclusionreport.destroy({where:{
-			// 									patientId:req.params.patientId,itemName:conclusions[i].itemName ,
-			// 										  }})
-			// 				}
-							
-			// 					db.conclusionreport.create({
-			// 						...conclusions[i],
-			// 						patientId:req.params.patientId
-			// 										})
+							});
+							console.log(conclusions[i])
+							console.log(totalCount);
+							console.log('-------------');
+							if(totalCount.count>0){
+						await db.conclusionreport.destroy({where:{
+												patientId:req.params.patientId,
+													  }})
+							}
+							for(i in conclusions){
+								await db.conclusionreport.create({
+									...conclusions[i],
+									patientId:req.params.patientId
+													})
 							
 					
 					
-			// 	}
+				}
 							
-			// 		}
-			// 		if (doctorAdvice) {
-			// 			for(i in doctorAdvice){
-			// 				let objlength = Object.keys(doctorAdvice[i]).length
-			// 				//for(j in doctorAdvice[i]){
-			// 					let totalCount =  await db.doctoradvicereport.findAndCountAll({
-			// 						where:{
-			// 				  patientId:req.params.patientId,itemName:doctorAdvice[i].itemName,id:doctorAdvice[i].id
-			// 						},
-			// 						raw:true,
-			// 					});
-			// 					if(totalCount.count>0){
-			// 				db.doctoradvicereport.destroy({where:{
-			// 										patientId:req.params.patientId,itemName:doctorAdvice[i].itemName ,
-			// 											  }})
-			// 					}
-							
-			// 						db.doctoradvicereport.create({
-			// 							...doctorAdvice[i],
-			// 							patientId:req.params.patientId
-			// 											})
+					}
+					if (doctorAdvice) {
+					
+							//let objlength = Object.keys(doctorAdvice[i]).length
+							//for(j in doctorAdvice[i]){
+								let totalCount =  await db.doctoradvicereport.findAndCountAll({
+									where:{
+							  patientId:req.params.patientId
+									},
+									raw:true,
+								});
+								if(totalCount.count>0){
+							await db.doctoradvicereport.destroy({where:{
+													patientId:req.params.patientId,
+														  }})
+								}
+								for(i in doctorAdvice){
+									await db.doctoradvicereport.create({
+										...doctorAdvice[i],
+										patientId:req.params.patientId
+														})
 								
 						
 						
-			// 		}
+					}
 								
-			// 			}
-			// 			if (impressions) {
-			// 				for(i in impressions){
-			// 					let objlength = Object.keys(impressions[i]).length
-			// 					//for(j in impressions[i]){
-			// 						let totalCount =  await db.impressionreport.findAndCountAll({
-			// 							where:{
-			// 					  patientId:req.params.patientId,itemName:impressions[i].itemName,id:impressions[i].id
-			// 							},
-			// 							raw:true
-			// 						});
-			// 						if(totalCount.count>0){
-			// 					db.impressionreport.destroy({where:{
-			// 											patientId:req.params.patientId,itemName:impressions[i].itemName ,id:impressions[i].id
-			// 												  }})
-			// 						}
-								
-			// 							db.impressionreport.create({
-			// 								...impressions[i],
-			// 								patientId:req.params.patientId
-			// 												})
+						}
+						if (impressions) {
+							
+								let objlength = Object.keys(impressions).length
+								//for(j in impressions[i]){
+									let totalCount =  await db.impressionreport.findAndCountAll({
+										where:{
+								  patientId:req.params.patientId
+										},
+										raw:true
+									});
+									console.log(impressions)
+									 if(totalCount.count>0){
+								const delimpressions=await db.impressionreport.destroy({where:{
+														patientId:req.params.patientId
+															  }})
+															}
+							
+							for(j in impressions){
+									const createimpressions=await db.impressionreport.create({
+											...impressions[j],
+											patientId:req.params.patientId
+															})
 									
 							
 							
-			// 			}
+						}
 									
-			// 				}
+							}
 
-			// 				if (conclusionsComments) {
-			// 					for(let i=0;i<conclusionsComments.length;i++){
-			// 						let objlength = Object.keys(conclusionsComments[i]).length
-			// 							let totalCount =  await db.conclusionsComments.findAndCountAll({
-			// 								where:{
-			// 						  patientId:req.params.patientId,conclusioncomment:conclusionsComments[i].conclusioncomment
-			// 								},
-			// 								raw:true
-			// 							});
-			// 							if(totalCount.count>0){
-			// 						db.conclusionsComments.destroy({where:{
-			// 												patientId:req.params.patientId,conclusioncomment:conclusionsComments[i].conclusioncomment													  }})
-			// 							}
-										
-			// 								db.conclusionsComments.create({
-			// 									...conclusionsComments[i],
-			// 									patientId:req.params.patientId
-			// 													})
+							if (conclusionsComments) {
+							//									let objlength = Object.keys(conclusionsComments[i]).length
+										let totalCount =  await db.conclusionsComments.findAndCountAll({
+											where:{
+									  patientId:req.params.patientId},
+											raw:true
+										});
+										if(totalCount.count>0){
+									db.conclusionsComments.destroy({where:{
+															patientId:req.params.patientId}
+									})
+										}
+										for(let i=0;i<conclusionsComments.length;i++){
+										const createconclusioncomment=	await db.conclusionsComments.create({
+												...conclusionsComments[i],
+												patientId:req.params.patientId
+																})
 														
-			// 				}
-			// 				}
-			// 				if (doctorAdviceComments) {
-			// 					for(let i=0;i<doctorAdviceComments.length;i++){
-			// 						let objlength = Object.keys(doctorAdviceComments[i]).length
-			// 							let totalCount =  await db.doctorAdviceComments.findAndCountAll({
-			// 								where:{
-			// 						  patientId:req.params.patientId,docadvicecomment:doctorAdviceComments[i].docadvicecomment
-			// 								},
-			// 								raw:true
-			// 							});
-			// 							if(totalCount.count>0){
-			// 						db.doctorAdviceComments.update({where:{
-			// 												patientId:req.params.patientId,docadvicecomment:doctorAdviceComments[i].docadvicecomment													  }})
-			// 							}
-									
-			// 								db.doctorAdviceComments.create({
-			// 									...doctorAdviceComments[i],
-			// 									patientId:req.params.patientId
-			// 													})
+							}
+							}
+							if (doctorAdviceComments) {
+								
+									//let objlength = Object.keys(doctorAdviceComments[i]).length
+										let totalCount =  await db.doctorAdviceComments.findAndCountAll({
+											where:{
+									  patientId:req.params.patientId},
+											raw:true
+										});
+										if(totalCount.count>0){
+									db.doctorAdviceComments.destroy({where:{
+															patientId:req.params.patientId,}})}
+															for(let i=0;i<doctorAdviceComments.length;i++){
+										const doctorAdviceComment=await db.doctorAdviceComments.create({
+												...doctorAdviceComments[i],
+												patientId:req.params.patientId
+																})
 															
-			// 				}
-			// 				}
-			// 				if (impressionComments) {
-			// 					for(let i=0;i<impressionComments.length;i++){
-			// 						let objlength = Object.keys(impressionComments[i]).length
-			// 						console.log(impressionComments[i])
-			// 							let totalCount =  await db.impressionComments.findAndCountAll({
-			// 								where:{
-			// 						  patientId:req.params.patientId,impressioncomment:impressionComments[i].impressioncomment
-			// 								},
-			// 								raw:true
-			// 							});
-			// 							if(totalCount.count>0){
-			// 						db.impressionComments.destroy({where:{
-			// 												patientId:req.params.patientId,impressioncomment:impressionComments[i].impressioncomment													  }})
-			// 							}
-										
-			// 								db.impressionComments.create({
-			// 									...impressionComments[i],
-			// 									patientId:req.params.patientId
-			// 													})
-															
-			// 				}
-			// 				} 	
-			// 				if(relativewall){
-			// 					console.log('waredsgdfrhtjykulio;srfdfghtyjkuil;orytdyfgkujhiklj;oksytdyfguhiklj;lo')
+							}
+							}
+							if (impressionComments) {
 							
-			// 						//let objlength = Object.keys(impressionComments[i]).length
-			// 						//console.log(speckleTracking[i])
+									// let objlength = Object.keys(impressionComments[i]).length
+									// console.log(impressionComments[i])
+										let totalCount =  await db.impressionComments.findAndCountAll({
+											where:{
+									  patientId:req.params.patientId,	},
+											raw:true
+										});
+										if(totalCount.count>0){
+									await db.impressionComments.destroy({where:{
+															patientId:req.params.patientId		  }})
+										}
+										for(let i=0;i<impressionComments.length;i++){	
+										await db.impressionComments.create({
+												...impressionComments[i],
+												patientId:req.params.patientId
+																})
+															
+							}
+							} 	
+							if(relativewall){
+							
 									
-			// 							let totalCount =  await db.regionalwallmotion.findAndCountAll({
-			// 								where:{
-			// 						  patientId:req.params.patientId
-			// 								},
-			// 								raw:true
-			// 							});
-			// 							console.log(totalCount)
-			// 							if(totalCount.count>0){
-			// 						db.regionalwallmotion.destroy({where:{
-			// 												patientId:req.params.patientId							  }})
-			// 							}
-			// 							console.log(relativewall)
-			// 								db.regionalwallmotion.create({
-			// 									...relativewall,
-			// 									patientId:req.params.patientId
-			// 													})
+									let totalCount =  await db.regionalwallmotion.findAndCountAll({
+											where:{
+									  patientId:req.params.patientId
+											},
+											raw:true
+										});
+										//console.log(totalCount)
+										if(totalCount.count>0){
+									await db.regionalwallmotion.destroy({where:{
+															patientId:req.params.patientId							  }})
+										}
+										//console.log(relativewall)
+											await db.regionalwallmotion.create({
+												...relativewall,
+												patientId:req.params.patientId
+																})
 													
 							
-			// 				}
-			// 				if(speckleTracking){
-			// 					for(let i=0;i<speckleTracking.length;i++){
-			// 						//let objlength = Object.keys(impressionComments[i]).length
-			// 						console.log(speckleTracking[i])
-			// 							let totalCount =  await db.speckletrackingreport.findAndCountAll({
-			// 								where:{
-			// 						  patientId:req.params.patientId,itemName:speckleTracking[i].itemName
-			// 								},
-			// 								raw:true
-			// 							});
-			// 							if(totalCount.count>0){
-			// 						db.speckletrackingreport.destroy({where:{
-			// 												patientId:req.params.patientId,speckleTracking:speckleTracking[i].itemName													  }})
-			// 							}
-										
-			// 								db.speckletrackingreport.create({
-			// 									...speckleTracking[i],
-			// 									patientId:req.params.patientId
-			// 													})
+							}
+							if(speckleTracking){
+								
+									//let objlength = Object.keys(impressionComments[i]).length
+									console.log(speckleTracking[i])
+										let totalCount =  await db.speckletrackingreport.findAndCountAll({
+											where:{
+									  patientId:req.params.patientId,		},
+											raw:true
+										});
+										if(totalCount.count>0){
+								await db.speckletrackingreport.destroy({where:{
+															patientId:req.params.patientId			  }})
+										}
+										for(let i=0;i<speckleTracking.length;i++){
+											await db.speckletrackingreport.create({
+												...speckleTracking[i],
+												patientId:req.params.patientId
+																})
 													
-			// 				}
-			// 				}
-				return res.json({message:"report updated successfully",selectedObservations,observations,conclusions,relativewall,speckleTracking});
+							}
+							}
+				return res.json({message:"report updated successfully",selectedObservations,observations,conclusions,doctorAdvice,impressions,conclusionsComments,doctorAdviceComments, impressionComments,comments,relativewall,speckleTracking});
 	
-			}catch{
- return res.json({})
-		} 
+			
 	}
+			
+
 

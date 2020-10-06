@@ -15,7 +15,7 @@ const Patient = db.patientmodel;
 var GetDicomData = require('../../controller/controller')
 // const bodyParser = require("body-parser");
 // const cors = require('cors')
-const upload = require('../../config/upload');
+//const upload = require('../../config/upload');
 var dicomParser = require('../../../node_modules/dicom-parser/dist/dicomParser');
 
 // Load in Rusha so we can calculate sha1 hashes
@@ -67,6 +67,8 @@ app.get('/api/findall/patdoc/:docId',controller.getAllPatients);
 app.get('/api/findOne/patient/:id',controller.getPatient)
 
 app.get('/api/findAll/patients/:clinicId',controller.getClinic)
+
+app.put('/api/save/patient/:id',controller.updPatient);
 
 
 ///patient master api's
