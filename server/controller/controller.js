@@ -660,49 +660,49 @@ return res.status(200).json({
 }
  
 
-exports.getAllPatients = (req, res) => {
-	Patient.findAll({
-		where: {docId :req.params.docId},
-		order: [
-			[Sequelize.literal('id'), 'desc']
-	 ]
-	}).then(doctor => {
-		res.status(200).json({
-			"description": "Patient Content Page",
-			"doctor": doctor
-		});
-	}).catch(err => {
-		res.status(500).json({
-			"description": "Can not access Patient Page",
-			"error": err
-		});
-	})
-}
+// exports.getAllPatients = (req, res) => {
+// 	Patient.findAll({
+// 		where: {docId :req.params.docId},
+// 		order: [
+// 			[Sequelize.literal('id'), 'desc']
+// 	 ]
+// 	}).then(doctor => {
+// 		res.status(200).json({
+// 			"description": "Patient Content Page",
+// 			"doctor": doctor
+// 		});
+// 	}).catch(err => {
+// 		res.status(500).json({
+// 			"description": "Can not access Patient Page",
+// 			"error": err
+// 		});
+// 	})
+// }
 
-// exports.getAllPatients = async(req, res) => {
-// 	const patient=await	Patient.findAll({
-// 			where: {docId :req.params.docId},
-// 			raw:true,
-// 			order: [
-// 				[Sequelize.literal('id'), 'desc']
-// 		 ]
-// 		})
-// 	const docpatient = patient.map(async data=>{
-// 		const observationcount = await db.observations.findAndCountAll({
-// 			where:{patientId:data.id}
+exports.getAllPatients = async(req, res) => {
+	const patient=await	Patient.findAll({
+			where: {docId :req.params.docId},
+			raw:true,
+			order: [
+				[Sequelize.literal('id'), 'desc']
+		 ]
+		})
+	const docpatient = patient.map(async data=>{
+		const observationcount = await db.observations.findAndCountAll({
+			where:{patientId:data.id}
 	
-// 		 })
-// 		 totalCount= observationcount.count
+		 })
+		 totalCount= observationcount.count
 	
-// 		return {...data,totalCount}
-// 	})
-// 	const doctor = await Promise.all(docpatient)
+		return {...data,totalCount}
+	})
+	const doctor = await Promise.all(docpatient)
 	
-// 	return res.status(200).json({
-// 		doctor,
+	return res.status(200).json({
+		doctor,
 		
-// 	})
-// 	}
+	})
+	}
 
 
 exports.getPatient = (req, res) => {
