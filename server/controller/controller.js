@@ -1675,41 +1675,37 @@ console.log(req.body.type);
 			  }
 
 						
-				
+			  try{
 				if (observations) {
-					// if(comments){
-					for(i in observations){
-						let objlength = Object.keys(observations[i]).length
-						//for(j in observations){
-							console.log(observations[i].comments)
-							if(observations[i].comments){
-								for(j in observations[i].comments){
-									console.log(observations[i].comments[j].comment)
-									let totalCount =  await db.observtaionComments.findAndCountAll({
-										where:{
-								  patientId:req.params.patientId,							},
-										raw:true
-									});
-									if(totalCount.count>0){
-								await db.observtaionComments.destroy({where:{
-														patientId:req.params.patientId,}})
-									}
-									
-									await db.observtaionComments.create({
-											...observations[i].comments[j],
+					// if(comments){\
+					const obs= [].concat(observations)
+					let totalCount =  await db.observtaionComments.findAndCountAll({
+						where:{
+				  patientId:req.params.patientId,							},
+						raw:true
+					});
+					if(totalCount.count>0){
+						await db.observtaionComments.destroy({where:{
+												patientId:req.params.patientId,}})
+							}
+				
+						for(i in obs){
+						for(j in obs[i].comments){
+						console.log(obs[i].comments[j].comment,i,j)
+										await db.observtaionComments.create({
+											...obs[i].comments[j],
 											patientId:req.params.patientId
 															})
 									
-							}
-		
-		
-								
-							}
-					
-					
-				}
-			// }		
+							}		
+						}		
+					}}
+					catch(err){
+						console.log(err);
+						return res.send({message:"cannot insert observation comments"})
 					}
+
+
 				if (conclusions) {
 					console.log('****CONCLUSIONS');
 					
