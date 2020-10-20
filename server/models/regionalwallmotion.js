@@ -18,17 +18,17 @@ module.exports = (sequelize, DataTypes) => {
               required: true
               },
               pulmonaryarterypressure: {
-              type: DataTypes.INTEGER,
+              type: DataTypes.STRING,
               required: true
               },      
               valueofef: {
-              type: DataTypes.INTEGER,
+              type: DataTypes.STRING,
               required: true
               },    
               avgsystolicstrain: {
               type: DataTypes.STRING,
               required: true
-              }, 
+              },
               peaksystolicstrain: {
               type: DataTypes.JSON,
               required: true
