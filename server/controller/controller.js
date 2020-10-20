@@ -11,6 +11,7 @@ const LeftVentricle = db.leftVentrical;
 const PatientMaster = db.patientMaster;
 const KinMaster = db.kinMaster;
 const Observations = db.observations;
+const salutationMaster = db.salutationMaster;
 
 const {sendEmail,textMessage} = require('../routes/registrationRoutes')
 
@@ -784,7 +785,7 @@ exports.patientMaster = (req, res) => {
 		...req.body,
 	}).then(patient => {
 		res.status(200).json({
-			"description": "patient Page",
+			"description": "Patient Created",
 			"user": patient,
 			
 		});
@@ -819,7 +820,7 @@ exports.findOnePatientMaster = (req, res) => {
 		where:{id :req.params.id},
 		}).then(patient => {
 			res.status(200).json({
-				"description": "patient Page",
+				"description": "Patient Page",
 				"user": patient,
 				
 			});
@@ -1895,10 +1896,39 @@ console.log(req.body.type);
 													
 							}
 							}
+
+							await db.patientmodel.update({status:'closed'},{where:{id:req.params.patientId}})
+
 				return res.json({message:"report updated successfully",selectedObservations,observations,conclusions,doctorAdvice,impressions,conclusionsComments,doctorAdviceComments, impressionComments,comments,relativewall,speckleTracking});
 	
 			
 	}
-			
+
+	exports.getAllPatientMasterFetch = async(req, res) => {
+		try{
+			const salutation = await db.salutationMaster.findAll({wherer:{}})
+			const complains = await db.complaintsMaster.findAll({where:{}})
+		//	const gender = await db.gender.findAll({where:{}})
+			const maritalstatus = await db.martialStatus.findAll({where:{}})
+			const occupation = await db.occupationMaster.findAll({where:{}})
+			const religion = await db.religionMaster.findAll({where:{}})
+			const educationalqualifications = await db.educationalMaster.findAll({where:{}})
+			const doctor = await db.doctorManagement.findAll({where:{clinicId:req.params.id}})
+			return res.send({
+			salutation:salutation,
+			complains:complains,
+			//gender:gender,
+			maritalstatus:maritalstatus,
+			occupation:occupation,
+			religion:religion,
+			educationalqualifications:educationalqualifications,
+			doctor:doctor
+			})
+				}
+				catch{err => {
+					res.status(500).send('Error -> ' + err);
+				}}
+		
+	}
 
 

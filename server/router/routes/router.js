@@ -122,6 +122,11 @@ app.get('/api/findall/observations/:patientId',controller.findAllObservations);
 app.post('/api/update/observation/:patientId',controller.updateobs)
 app.post('/api/update/report/:patientId',controller.updatereport)
 
+/////////////////////////////////// GET PATIENTFORM SUB FIELDS 
+
+app.get('/api/auth/getallpatientmasterfetch/:id',controller.getAllPatientMasterFetch)
+
+
 
 
 }
