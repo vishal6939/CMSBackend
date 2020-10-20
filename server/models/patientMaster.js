@@ -45,7 +45,7 @@ fdoctor : {
 },
 
 age : {
-    type: DataTypes.STRING
+    type: DataTypes.INTEGER
 },
 
 district : {

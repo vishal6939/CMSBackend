@@ -12,9 +12,7 @@ const app = express()
 const db = require('../../config/db');
 const Patient = db.patientmodel;
 var GetDicomData = require('../../controller/controller')
-// const bodyParser = require("body-parser");
-// const cors = require('cors')
-//const upload = require('../../config/upload');
+const upload = require('../../config/upload');
 var dicomParser = require('../../../node_modules/dicom-parser/dist/dicomParser');
 // Load in Rusha so we can calculate sha1 hashes
  var Rusha = require('../../../node_modules/rusha/dist/rusha');
@@ -61,8 +59,6 @@ app.get('/api/findOne/patient/:id',controller.getPatient)
 
 app.get('/api/findAll/patients/:clinicId',controller.getClinic)
 
-app.put('/api/save/patient/:id',controller.updPatient);
-
 
 ///patient master api's
 app.post('/api/auth/patientmaster',controller.patientMaster)
@@ -106,11 +102,6 @@ app.get('/api/findall/observations/:patientId',controller.findAllObservations);
 //app.post('/api/create/report/:patientId/:type',controller.report)
 app.post('/api/update/observation/:patientId',controller.updateobs)
 app.post('/api/update/report/:patientId',controller.updatereport)
-
-/////////////////////////////////// GET PATIENTFORM SUB FIELDS 
-
-app.get('/api/auth/getallpatientmasterfetch/:id',controller.getAllPatientMasterFetch)
-
 
 
 

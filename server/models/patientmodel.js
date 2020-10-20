@@ -165,7 +165,7 @@ bsa:{
         required:true
     },
 mobileno:{
-    type:DataTypes.STRING,
+    type:DataTypes.INTEGER,
     required:true
 },
 type: { 
