@@ -74,6 +74,7 @@ db.observtaionComments = require('../models/observtaionComments')(sequelize, Seq
 db.educationalMaster=require('../models/educationalMaster')(sequelize, Sequelize);
 db.salutationMaster=require('../models/salutationMaster')(sequelize, Sequelize);
 db.hospitalSpeciality=require('../models/hospitalSpeciality')(sequelize, Sequelize);
+db.hospitalService=require('../models/hospitalService')(sequelize, Sequelize);
 db.hospitalType=require('../models/hospitalType')(sequelize, Sequelize);
 db.religionMaster=require('../models/religionMaster')(sequelize, Sequelize);
 db.occupationMaster=require('../models/occupationMaster')(sequelize, Sequelize);
@@ -81,6 +82,13 @@ db.diagnosisMaster=require('../models/diagnosisMaster')(sequelize, Sequelize);
 db.complaintsMaster=require('../models/complaintsMaster')(sequelize, Sequelize);
 db.branchMaster=require('../models/branchMaster')(sequelize, Sequelize);
 db.martialStatus=require('../models/maritalStatus')(sequelize, Sequelize);
+
+db.gender = require('../models/gendermaster')(sequelize, Sequelize);
+db.state = require('../models/statemaster')(sequelize, Sequelize);
+db.country = require('../models/countrymaster')(sequelize, Sequelize);
+db.referralcomment = require('../models/referralcomment')(sequelize, Sequelize);
+db.complains = require('../models/complains')(sequelize, Sequelize);
+
 
 db.patientMaster=require('../models/patientMaster')(sequelize, Sequelize);
 db.kinMaster = require('../models/kinmaster')(sequelize, Sequelize);

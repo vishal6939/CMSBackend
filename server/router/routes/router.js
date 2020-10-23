@@ -62,15 +62,21 @@ app.get('/api/auth/master/:data',controller.master );
 app.put('/api/update/patient/:id',controller.updatePatient);
 app.delete('/api/delete/patient/:id',controller.deletePatient);
 app.get('/api/findall/patient/:clinicId/:status',controller.findpatient);
+app.get('/api/findall/patientstatusreport/:clinicId/:status',controller.findpatientreport);
+
 //app.get('/api/findall/patient/:docId',controller.getAllPatients);
 app.get('/api/findall/patdoc/:docId',controller.getAllPatients);
+
+/////////////////////////
+app.get('/api/findall/patientdoc/:docId/:status',controller.getAllPatientsStatus);
+
 app.get('/api/findOne/patient/:id',controller.getPatient)
 
 app.get('/api/findAll/patients/:clinicId',controller.getClinic)
 
 app.put('/api/save/patient/:id',controller.updPatient);
 
-
+app.put('/api/save/patientReportclosed/:id',controller.updPatientReportStatus);
 ///patient master api's
 app.post('/api/auth/patientmaster',controller.patientMaster)
 app.get('/api/auth/findpatientmaster',controller.findPatientMaster)
@@ -126,7 +132,7 @@ app.post('/api/update/report/:patientId',controller.updatereport)
 
 app.get('/api/auth/getallpatientmasterfetch/:id',controller.getAllPatientMasterFetch)
 
-
-
+app.post('/api/auth/referralcomment/:patientId',controller.referralcomment)
+app.get('/api/auth/getreferralcomment/:patientId',controller.getAllReferralComment)
 
 }

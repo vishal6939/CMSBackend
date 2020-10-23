@@ -556,6 +556,27 @@ exports.updatePatient = async(req, res) => {
 		
 }
 
+exports.updPatientReportStatus = async(req,res)=>{
+	const id = req.params.id;
+	// const{ password} = req.body
+	Patient.update( { status:'closed' }, 
+			 { where: {id: req.params.id} }
+			 ).then(patient => {
+				res.status(200).json({
+					"description": "Patient Status updated",
+					status:200
+					
+				});
+			}).catch(err => {
+				res.status(500).json({
+					"description": "Can not update patient Details",
+					"error": err,
+					status:500
+				});
+			})
+		
+}
+
 
   exports.deletePatient = (req, res) => {
 	const id = req.params.id;
@@ -596,6 +617,7 @@ exports.updatePatient = async(req, res) => {
 // }
 
 exports.findpatient = async(req, res) => {
+	const {status}=req.params.status;
 
 	const patientsDataRelatedClinic = await Patient.findAll({
 		where: {clinicId: req.params.clinicId,status:req.params.status},
@@ -658,27 +680,51 @@ return res.status(200).json({
 	user: clinicDashboardData,
 	
 })
+
 }
  
 
-// exports.getAllPatients = (req, res) => {
-// 	Patient.findAll({
-// 		where: {docId :req.params.docId},
-// 		order: [
-// 			[Sequelize.literal('id'), 'desc']
-// 	 ]
-// 	}).then(doctor => {
-// 		res.status(200).json({
-// 			"description": "Patient Content Page",
-// 			"doctor": doctor
-// 		});
-// 	}).catch(err => {
-// 		res.status(500).json({
-// 			"description": "Can not access Patient Page",
-// 			"error": err
-// 		});
-// 	})
-// }
+
+exports.findpatientreport = async(req, res) => {
+	const {status}=req.params.status;
+		const patientsDataRelatedClinic = await Patient.findAll({
+			where: {clinicId: req.params.clinicId,[Op.or]:[{status:'assigned'}, {status: 'Report Generated'}]},
+		raw: true,
+			order: [
+				[Sequelize.literal('id'), 'desc']
+		 ]
+		})
+	
+		
+			 const doctorListRelatedToClinic1 = patientsDataRelatedClinic.map(async data =>{
+				const doctorListRelatedToClinic=await DoctorManagement.findAll({
+				where: {clinicId: data.clinicId},
+				raw: true,
+				order: [
+						[Sequelize.literal('id'), 'desc']
+				]
+			 })
+			 doctorListRelatedToClinic.push({'id':null,name:'Select A Doctor'})
+			 const doc = await Promise.all(doctorListRelatedToClinic)
+			 console.log((doc))
+			 const observationcount = await db.observations.findAndCountAll({
+				where:{patientId:data.id}
+		
+			 })
+			 totalCount= observationcount.count
+			return {...data,totalCount,doctorList:doc}
+			})
+		  const clinicDashboardData = await Promise.all(doctorListRelatedToClinic1)
+	 
+	
+	return res.status(200).json({
+		user: clinicDashboardData,
+		
+	})
+	
+	}
+	
+	
 
 exports.getAllPatients = async(req, res) => {
 	const patient=await	Patient.findAll({
@@ -704,6 +750,37 @@ exports.getAllPatients = async(req, res) => {
 		
 	})
 	}
+
+
+	exports.getAllPatientsStatus = async(req, res) => {
+		//const {status}=req.params.status
+		
+		const patient=await	Patient.findAll({
+				where: {docId :req.params.docId,status: req.params.status},
+				raw:true,
+				order: [
+					[Sequelize.literal('id'), 'desc']
+			 ]
+			})
+		
+		const docpatient = patient.map(async data=>{
+			const observationcount = await db.observations.findAndCountAll({
+				where:{patientId:data.id}
+		
+			 })
+			 totalCount= observationcount.count
+		
+			return {...data,totalCount}
+		})
+	
+		const doctor = await Promise.all(docpatient)
+	
+		return res.status(200).json({
+			doctor,
+			
+		})
+		
+		}
 
 
 exports.getPatient = (req, res) => {
@@ -1516,38 +1593,7 @@ exports.Observation = async(req,res,next) =>{
 			});
 		})
 	}
-	// exports.findAllObservations = (req, res) => {
-	// 	db.observations.findAll({
-	// 	where:{patientId:req.params.patientId},
-		
-	// 	}).then(observation => {
-	// 		res.status(200).json({
-	// 			"description": "observation Page",
-	// 			"user": observation,
-				
-	// 		});
-	// 	}).catch(err => {
-	// 		res.status(500).json({
-	// 			"description": "Can not access observation Page",
-	// 			"error": err
-	// 		});
-	// 	})
-	// }
-
-
-
-// 	exports.findAllObservations = async(req, res) => {
-// 		try{
-// 			let formatedfinalList = []
-// 		const observations = await db.observations.findAll({
-// 		where:{patientId:req.params.patientId}})
-// 		const masterTablesData = await fetchMastterVariables()
-// 		return res.send({observations:observations,masterData:masterTablesData})
-// 	}catch{
-// 		return res.send({})
-// 	}
-// }
-
+	
 exports.findAllObservations = async(req, res) => {
 	try{
 		let formatedfinalList = []
@@ -1897,7 +1943,7 @@ console.log(req.body.type);
 							}
 							}
 
-							await db.patientmodel.update({status:'closed'},{where:{id:req.params.patientId}})
+							await db.patientmodel.update({status:'Report Generated'},{where:{id:req.params.patientId}})
 
 				return res.json({message:"report updated successfully",selectedObservations,observations,conclusions,doctorAdvice,impressions,conclusionsComments,doctorAdviceComments, impressionComments,comments,relativewall,speckleTracking});
 	
@@ -1914,6 +1960,8 @@ console.log(req.body.type);
 			const religion = await db.religionMaster.findAll({where:{}})
 			const educationalqualifications = await db.educationalMaster.findAll({where:{}})
 			const doctor = await db.doctorManagement.findAll({where:{clinicId:req.params.id}})
+			const country = await db.country.findAll({where:{}})
+			const state = await db.state.findAll({where:{}})
 			return res.send({
 			salutation:salutation,
 			complains:complains,
@@ -1922,6 +1970,8 @@ console.log(req.body.type);
 			occupation:occupation,
 			religion:religion,
 			educationalqualifications:educationalqualifications,
+			country:country,
+			state:state,
 			doctor:doctor
 			})
 				}
@@ -1930,5 +1980,41 @@ console.log(req.body.type);
 				}}
 		
 	}
+	exports.referralcomment = async(req, res) => {
+		db.referralcomment.create({
+			...req.body,patientId:req.params.patientId
+		}).then(referralcomment => {
+			res.status(200).json({
+				"comment": referralcomment,
+				"description": "Comment Success",
+				status:200
+				
+			});
+		}).catch(err => {
+			res.status(500).json({
+			"description": "Can not access referralcomment Page",
+				"error": err,
+				status:500
+			});
+		})
+	}
 
-
+		exports.getAllReferralComment = (req, res) => {
+			db.referralcomment.findAll({
+			where:{patientId :req.params.patientId},
+			order: [
+				[Sequelize.literal('id'), 'desc']
+		 ]
+			}).then(comment => {
+				res.status(200).json({
+					"description": "Referral Comment",
+					"referralcomment": comment,
+					
+				});
+			}).catch(err => {
+				res.status(500).json({
+					"description": "Can not get Referral Comment",
+					"error": err
+				});
+			})
+		}		
