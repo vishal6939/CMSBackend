@@ -135,4 +135,7 @@ app.get('/api/auth/getallpatientmasterfetch/:id',controller.getAllPatientMasterF
 app.post('/api/auth/referralcomment/:patientId',controller.referralcomment)
 app.get('/api/auth/getreferralcomment/:patientId',controller.getAllReferralComment)
 
+app.get('/api/auth/getallhospitalclinicfetch/',controller.getAllHostipalClinicSubFetch)
+
+
 }
