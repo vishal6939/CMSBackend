@@ -49,6 +49,7 @@ const { response, request } = require('express');
 const { loginLookUp, doctorManagement, impressionreport } = require('../config/db');
 const clinicManagement = require('../models/clinicManagement');
 const { send } = require('process');
+const complains = require('../models/complains');
  
 exports.registration = async(req, res) => {
 
@@ -856,23 +857,72 @@ exports.master = (req,res) => {
 
 
 /// patient master controllers 
-exports.patientMaster = (req, res) => {
-	PatientMaster.create({
-		$complains: req.body.complains,
-		...req.body,
-	}).then(patient => {
-		res.status(200).json({
-			"description": "Patient Created",
-			"user": patient,
+// exports.patientMaster = (req, res) => {
+// 	PatientMaster.create({
+// 		$complains: req.body.complains,
+// 		...req.body,
+// 	}).then(patient => {
+// 		res.status(200).json({
+// 			"description": "Patient Created",
+// 			"user": patient,
 			
-		});
-	}).catch(err => {
-		res.status(500).json({
-			"description": "Can not access patient Page",
-			"error": err
-		});
-	})
+// 		});
+// 	}).catch(err => {
+// 		res.status(500).json({
+// 			"description": "Can not access patient Page",
+// 			"error": err
+// 		});
+// 	})
+// }
+
+exports.patientMaster = async(req, res) => {
+	const {complains} = req.body
+	// try{
+		console.log(complains)
+		console.log('+++++++++++++++++++');
+		
+   const result=await PatientMaster.create({
+		...req.body,
+   });
+	console.log(result)
+	// 	await db.complains.create({
+	// 		...req.body,patientId:result.id
+	//    },raw);
+	
+	if (complains) {
+		console.log(complains)
+		console.log('**********************');
+		//									let objlength = Object.keys(conclusionsComments[i]).length
+					let totalCount =  await db.complains.findAndCountAll({
+						where:{
+				patientId:result.id},
+						raw:true
+					});
+					console.log(totalCount.count)
+					if(totalCount.count>0){
+				db.complains.destroy({where:{
+										patientId:req.params.patientId}
+				})
+					}
+
+					for(i in complains){
+					const createcomplains=	await db.complains.create({
+							...complains[i],
+							patientId:result.id
+											})
+									
+		}
+		}
+		return res.json({result:result})
+// }
+// catch{
+// 	err => {
+// 		res.status(500).send('Error -> ' + err);
+// 	}
+// }
 }
+
+
 exports.findPatientMaster = (req, res) => {
 	db.patientMaster.findAll({
 	where:{},
@@ -892,42 +942,51 @@ exports.findPatientMaster = (req, res) => {
 		});
 	})
 }
-exports.findOnePatientMaster = (req, res) => {
-	db.patientMaster.findOne({
+exports.findOnePatientMaster =  async(req, res) => {
+ const patient= await	db.patientMaster.findOne({
 		where:{id :req.params.id},
-		}).then(patient => {
-			res.status(200).json({
-				"description": "Patient Page",
-				"user": patient,
-				
-			});
-		}).catch(err => {
-			res.status(500).json({
-				"description": "Can not access patient Page",
-				"error": err
-			});
 		})
+		const complains=await db.complains.findAll({where:{patientId:req.params.id}});
+		
+		return res.json({"user":patient,"complains":complains})
 	}
-	exports.updatePatientMaster = (req, res) => {
+	exports.updatePatientMaster = async(req, res) => { 
 		const id = req.params.id;
+		const {complains} = req.body;
 		// const{ password} = req.body
-		PatientMaster.update( { ...req.body ,
+		try{
+		await PatientMaster.update( { ...req.body ,
 		}, 
 				 { where: {id: req.params.id} }
-				 ).then(patient => {
-					res.status(200).json({
-						"description": "patient Master updated",
-						status:200
-						
-					});
-				}).catch(err => {
-					res.status(500).json({
-						"description": "Can not update patient Master",
-						"error": err,
-						status:500
-					});
-				})
-			}
+				 )
+				 if (complains) {
+					console.log(complains)
+					console.log('**********************');
+					//									let objlength = Object.keys(conclusionsComments[i]).length
+								let totalCount =  await db.complains.findAndCountAll({
+									where:{
+							patientId:req.params.id},
+									raw:true
+								});
+								console.log(totalCount.count)
+								if(totalCount.count>0){
+							await db.complains.destroy({where:{
+													patientId:req.params.id}
+							})
+								}
+			
+								for(i in complains){
+								const createcomplains=	await db.complains.create({
+										...complains[i],
+										patientId:req.params.id
+														})
+												
+					}
+					}
+					return res.json({"message":"updated successfully",createcomplains:createcomplains})
+			}catch{
+				return res.json("error")
+			}}
 
 exports.deletePatientMaster = (req, res) => {
 	const id = req.params.id;
@@ -1594,6 +1653,40 @@ exports.Observation = async(req,res,next) =>{
 		})
 	}
 	
+// exports.findAllObservations = async(req, res) => {
+// 	try{
+// 		let formatedfinalList = []
+// 	const observations = await db.observations.findAll({
+// 	where:{patientId:req.params.patientId}})
+// 	const masterTablesData = await fetchMastterVariables()
+// 	const observationItem = await db.observationsItem.findAll({where:{patientId:req.params.patientId}})
+// 	const observtaionComments = await db.observtaionComments.findAll({where:{patientId:req.params.patientId}})
+// 	const conclusionreport = await db.conclusionreport.findAll({where:{patientId:req.params.patientId}})
+// 	 const conclusioncomment = await db.conclusionsComments.findAll({where:{patientId:req.params.patientId}})
+// 	 const impressionreport = await db.impressionreport.findAll({where:{patientId:req.params.patientId}})
+// 	 const impressioncomment = await db.impressionComments.findAll({where:{patientId:req.params.patientId}})
+// 	const doctorAdvicereport = await db.doctoradvicereport.findAll({where:{patientId:req.params.patientId}})
+// 	 const doctorAdviceComments = await db.doctorAdviceComments.findAll({where:{patientId:req.params.patientId}})
+// 	 const speckletrackingreport = await db.speckletrackingreport.findAll({where:{patientId:req.params.patientId}})	 	 
+// 	 const regionalWall = await db.regionalwallmotion.findAll({where:{patientId:req.params.patientId}})
+// 	return res.send({observations:observations,
+// 		masterData:masterTablesData,
+// 		 observationItem:observationItem,
+// 		observtaionComments:observtaionComments,
+// 		conclusionreport:conclusionreport,
+// 		conclusioncomment:conclusioncomment,
+// 		impressionreport:impressionreport,
+// 		impressioncomment:impressioncomment,
+// 		doctorAdvicereport:doctorAdvicereport,
+// 		doctorAdviceComments:doctorAdviceComments,
+// 		regionalWall:regionalWall,
+// 		speckleTrackingreport:speckletrackingreport
+// 	})
+// }catch{
+// 	return res.send({})
+// }
+// }
+
 exports.findAllObservations = async(req, res) => {
 	try{
 		let formatedfinalList = []
@@ -1610,6 +1703,7 @@ exports.findAllObservations = async(req, res) => {
 	 const doctorAdviceComments = await db.doctorAdviceComments.findAll({where:{patientId:req.params.patientId}})
 	 const speckletrackingreport = await db.speckletrackingreport.findAll({where:{patientId:req.params.patientId}})	 	 
 	 const regionalWall = await db.regionalwallmotion.findAll({where:{patientId:req.params.patientId}})
+	 const referralcomment = await db.referralcomment.findAll({where:{patientId:req.params.patientId}})
 	return res.send({observations:observations,
 		masterData:masterTablesData,
 		 observationItem:observationItem,
@@ -1621,7 +1715,8 @@ exports.findAllObservations = async(req, res) => {
 		doctorAdvicereport:doctorAdvicereport,
 		doctorAdviceComments:doctorAdviceComments,
 		regionalWall:regionalWall,
-		speckleTrackingreport:speckletrackingreport
+		speckleTrackingreport:speckletrackingreport,
+		referralcomment:referralcomment
 	})
 }catch{
 	return res.send({})
@@ -1980,23 +2075,44 @@ console.log(req.body.type);
 				}}
 		
 	}
-	exports.referralcomment = async(req, res) => {
-		db.referralcomment.create({
-			...req.body,patientId:req.params.patientId
-		}).then(referralcomment => {
-			res.status(200).json({
-				"comment": referralcomment,
-				"description": "Comment Success",
-				status:200
+	// exports.referralcomment = async(req, res) => {
+	// 	db.referralcomment.create({
+	// 		...req.body,patientId:req.params.patientId
+	// 	}).then(referralcomment => {
+	// 		res.status(200).json({
+	// 			"comment": referralcomment,
+	// 			"description": "Comment Success",
+	// 			status:200
 				
-			});
-		}).catch(err => {
-			res.status(500).json({
-			"description": "Can not access referralcomment Page",
-				"error": err,
-				status:500
-			});
-		})
+	// 		});
+	// 	}).catch(err => {
+	// 		res.status(500).json({
+	// 		"description": "Can not access referralcomment Page",
+	// 			"error": err,
+	// 			status:500
+	// 		});
+	// 	})
+	// }
+
+	exports.referralcomment = async(req, res) => {
+		let totalCount = await db.referralcomment.findAndCountAll({
+			where:{
+	 patientId:req.params.patientId
+			},
+			raw:true
+		});
+		if(totalCount.count>0){
+		db.referralcomment.update({
+			...req.body,
+			patientId:req.params.patientId
+		}, { where: {patientId: req.params.patientId} })}
+		else{
+			db.referralcomment.create({
+				...req.body,
+				patientId:req.params.patientId
+			})
+		}
+		return res.json({message:"referral comment submitted successfully",...req.body})
 	}
 
 		exports.getAllReferralComment = (req, res) => {
@@ -2017,4 +2133,28 @@ console.log(req.body.type);
 					"error": err
 				});
 			})
-		}		
+		}	
+		
+		
+		exports.getAllHostipalClinicSubFetch = async(req, res) => {
+			try{
+			const hospitalSpeciality = await db.hospitalSpeciality.findAll({wherer:{}})
+			const hospitalService = await db.hospitalService.findAll({where:{}})
+			const hospitalType = await db.hospitalType.findAll({where:{}})
+			const country = await db.country.findAll({where:{}})
+			const state = await db.state.findAll({where:{}})
+				
+				return res.send({
+				hospitalSpeciality:hospitalSpeciality,
+				hospitalService:hospitalService,
+				hostipalType:hospitalType,
+				country:country,
+				state:state,	
+				
+				})
+					}
+					catch{err => {
+						res.status(500).send('Error -> ' + err);
+					}}
+			
+		}
