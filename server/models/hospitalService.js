@@ -2,11 +2,11 @@
 
 module.exports = (sequelize, DataTypes) => {
     const TIMESTAMP = require('sequelize-mysql-timestamp')(sequelize);
-    const complaintsMaster= sequelize.define('complaintsMaster', {   
+    const HospitalService= sequelize.define('hospitalService', {   
       itemName: {
         type: DataTypes.STRING,
        required: true
-        }  
+        }       
       });
-    return complaintsMaster;
+    return HospitalService;
   };

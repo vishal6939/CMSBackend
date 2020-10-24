@@ -54,6 +54,9 @@ district : {
 city : {
     type: DataTypes.STRING
 },
+village : {
+    type: DataTypes.STRING
+},
 // Name of the village / City C - 15
 email : {
     type: DataTypes.STRING
